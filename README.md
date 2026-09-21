@@ -1,23 +1,36 @@
-# Central de Telemetria Agrícola
+# Telemetria Agrícola
 
-Arquitetura inicial para os módulos de Colhedora, Tratos, Plantadora e Bases.
+Arquitetura modular inicial com Colhedora, Tratos, Plantadora e Bases compartilhadas.
 
-## Estrutura
-- `index.html` — entrada, abre o módulo Colhedora.
-- `pages/colhedora.html` — módulo existente de Colhedora, com a lógica preservada.
-- `pages/tratos.html` — novo módulo de Tratos, com a mesma estrutura de ocorrências, mapas, filtros, insights e PDF; parâmetros: velocidade mínima, duração mínima e gap máximo.
-- `pages/plantadora.html` — placeholder para a próxima etapa.
-- `pages/bases.html` — área reservada para blocos, produtividade e chuva.
-- `assets/menu.css` e `assets/menu.js` — menu lateral compartilhado.
+## Bases compartilhadas
+- Blocos
+- Produtividade de cana
+- Chuva
+- Telemetria incremental por equipamento (Colhedora e Tratos)
 
-## Rodar no Codespace
-No terminal, dentro desta pasta, execute:
+## Telemetria incremental
+Os arquivos de telemetria são armazenados no IndexedDB do navegador, separados por equipamento e arquivo/data. Novos arquivos podem ser adicionados diariamente sem apagar os anteriores.
 
+A análise da Colhedora e de Tratos seleciona o período e usa os arquivos armazenados na página Bases.
+
+## Rodar no Codespaces
 ```bash
 python3 -m http.server 8000 --bind 0.0.0.0
 ```
+Depois abra a porta 8000.
 
-Depois abra a porta 8000 encaminhada pelo Codespaces.
-
-## Observação
-Colhedora e Tratos compartilham o mesmo IndexedDB de telemetria e das bases já existentes. O Tratos não exige a coluna de pressão de corte.
+## Estrutura
+```text
+projeto_telemetria/
+├── index.html
+├── assets/
+│   ├── bases.js
+│   ├── menu.css
+│   ├── menu.js
+│   └── telemetria-base.js
+└── pages/
+    ├── bases.html
+    ├── colhedora.html
+    ├── plantadora.html
+    └── tratos.html
+```

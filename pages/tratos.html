@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tratos — Analisador de Ocorrências de Telemetria</title>
+<title>Tratos — AgroVision Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -490,6 +490,242 @@ tbody tr:hover{box-shadow:inset 3px 0 0 var(--verde-500)}
 .periodo-telemetria input{width:100%;box-sizing:border-box}
 .periodo-disponivel{font-size:12px;color:#5c6861;padding:10px 12px;border-left:3px solid var(--verde-700);background:#fff;border-radius:8px}
 @media(max-width:700px){.periodo-telemetria{grid-template-columns:1fr}.base-telemetria-info{align-items:flex-start;flex-direction:column}}
+
+/* =========================================================
+   AGROVISION — linguagem visual compartilhada
+   Apenas estética; nenhuma regra de análise foi alterada.
+   ========================================================= */
+:root{
+  --agro-bg:#f3f5f1;
+  --agro-panel:rgba(255,255,255,.97);
+  --agro-border:#dfe5dd;
+  --agro-border-soft:#e9ede7;
+  --agro-primary:#2f6b54;
+  --agro-primary-dark:#183d30;
+  --agro-primary-soft:#e7f1eb;
+  --agro-text:#1f2923;
+  --agro-muted:#667168;
+  --agro-shadow:0 10px 30px rgba(24,52,40,.07);
+  --agro-shadow-hover:0 14px 34px rgba(24,52,40,.10);
+}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(900px 360px at 8% -5%,rgba(47,107,84,.10),transparent 65%),
+    radial-gradient(800px 320px at 100% 0%,rgba(111,145,104,.07),transparent 62%),
+    linear-gradient(180deg,#f7f8f5 0%,var(--agro-bg) 100%);
+  color:var(--agro-text);
+  font-family:"Inter",Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+.app-container{max-width:1480px;padding:28px 24px 64px}
+.card{
+  position:relative;
+  background:var(--agro-panel);
+  border:1px solid var(--agro-border);
+  border-radius:18px;
+  box-shadow:var(--agro-shadow);
+  transition:box-shadow .18s ease,border-color .18s ease;
+}
+.card:hover{box-shadow:var(--agro-shadow-hover)}
+.card:first-child{border-top:0;overflow:hidden}
+.card:first-child::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:4px;
+  background:linear-gradient(90deg,#183d30,#2f6b54,#5b9276);
+}
+.agrovision-eyebrow{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:0 0 6px;
+  color:var(--agro-primary);
+  font-size:10.5px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.agrovision-eyebrow span{opacity:.45}
+h1{
+  font-family:"Inter",Arial,Helvetica,sans-serif;
+  font-size:31px;
+  font-weight:800;
+  letter-spacing:-.035em;
+  color:#173b2e;
+  margin:0 0 8px;
+}
+h2,h3{
+  font-family:"Inter",Arial,Helvetica,sans-serif;
+  letter-spacing:-.025em;
+}
+.subtitle,.helptext,small{color:var(--agro-muted)}
+input,select,textarea{
+  border-color:#cfd7ce;
+  box-shadow:0 1px 2px rgba(14,36,29,.03);
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+input:focus,select:focus,textarea:focus{
+  outline:0;
+  border-color:var(--agro-primary);
+  box-shadow:0 0 0 3px rgba(47,107,84,.14);
+}
+button,.file-label{
+  transition:transform .15s,box-shadow .15s,filter .15s,background .15s;
+}
+button:hover,.file-label:hover{transform:translateY(-1px)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid rgba(47,107,84,.22);
+  outline-offset:2px;
+}
+button:disabled{opacity:.62;cursor:wait;transform:none!important}
+.primary,.file-label{
+  background:var(--agro-primary);
+  box-shadow:0 4px 12px rgba(24,61,48,.13);
+}
+.primary:hover,.file-label:hover{background:var(--agro-primary-dark);filter:none}
+.secondary{
+  background:#fff;
+  color:#294c3d;
+  border:1px solid var(--agro-border);
+}
+.secondary:hover{background:var(--agro-primary-soft);border-color:#b9d2c3;color:var(--agro-primary-dark)}
+.success{
+  background:#34735a;
+  box-shadow:0 4px 12px rgba(24,61,48,.13);
+}
+.summary{
+  gap:12px;
+  margin-bottom:18px;
+}
+.metric{
+  min-height:92px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:linear-gradient(180deg,#fff,#f5f7f3);
+  border:1px solid var(--agro-border);
+  border-radius:14px;
+  box-shadow:var(--agro-shadow);
+}
+.metric strong,.total-metric strong,.quality-item strong{
+  font-variant-numeric:tabular-nums;
+}
+.table-wrap{
+  border-color:var(--agro-border);
+  border-radius:14px;
+  box-shadow:0 3px 16px rgba(24,52,40,.035);
+  scrollbar-width:thin;
+}
+th{
+  background:#183d30;
+  color:#fff;
+}
+tbody tr{transition:background .12s ease,box-shadow .12s ease}
+tbody tr:hover{box-shadow:inset 3px 0 0 var(--agro-primary)}
+.badge.ok{background:#e7f1eb;color:#1f5d45;border-color:#c7ddce}
+.status{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.status::before{
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#4d9773;
+  flex:0 0 auto;
+}
+.progress-fill{background:linear-gradient(90deg,#2f6b54,#65a07f)}
+.base-telemetria-info,
+.periodo-telemetria,
+.filtro-operacoes,
+.mapa-geral-ocorrencias,
+.filtro-insights,
+.filtro-resultados{
+  border-color:var(--agro-border);
+  box-shadow:0 3px 16px rgba(24,52,40,.035);
+}
+.base-telemetria-info{
+  background:linear-gradient(135deg,#f7fbf8,#fff);
+}
+.base-telemetria-badge{
+  background:#e7f1eb;
+  color:#216143;
+}
+.periodo-disponivel{
+  border-left-color:var(--agro-primary);
+}
+#mapaOcorrencia,#mapaOcorrenciasGeral{
+  border-color:var(--agro-border);
+  background:#e9eee9;
+}
+.leaflet-container{font-family:"Inter",Arial,Helvetica,sans-serif}
+.leaflet-control-zoom a{color:#183d30!important}
+
+/* Ícones Lucide: substituem o emoji visual sem perder a ideia de cada seção. */
+.agro-icon{
+  width:16px;
+  height:16px;
+  stroke-width:2.25;
+  color:var(--agro-primary);
+  vertical-align:-3px;
+  margin-right:6px;
+}
+button .agro-icon,.file-label .agro-icon{
+  color:currentColor;
+  margin-right:7px;
+}
+h1 .agro-icon,h2 .agro-icon,h3 .agro-icon{
+  width:18px;
+  height:18px;
+  margin-right:7px;
+  vertical-align:-3px;
+}
+.collapsible-icon .agro-icon{
+  width:19px;height:19px;margin:0;
+}
+.filtro-acoes button{white-space:nowrap}
+
+/* Pequenos refinamentos para manter a hierarquia do dashboard. */
+.insight-box,.grafico-insight,.filtro-grafico-box,.filtro-insight-metrica,
+.quality-item,.unidades-painel,.operacoes-grupo{
+  border-color:var(--agro-border);
+}
+.insight-box,.grafico-insight{
+  background:linear-gradient(180deg,#fff,#f5f7f3);
+}
+.filtro-insight-metrica{background:#fff}
+@media(max-width:900px){
+  .app-container{padding:22px 18px 48px}
+}
+@media(max-width:600px){
+  .app-container{padding:16px 12px 40px}
+  h1{font-size:27px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+
+
+
+/* ===== AGROVISION — ocupação total do espaço ===== */
+.app-container{
+  max-width:none!important;
+  width:auto!important;
+  box-sizing:border-box!important;
+}
+
+@media(max-width:900px){
+  .app-container{
+    width:100%!important;
+    max-width:none!important;
+  }
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 />
@@ -508,31 +744,29 @@ let marcadoresOcorrencia = [];
 let ocorrenciaMapaAtual = null;
 </script>
 <link rel="stylesheet" href="../assets/menu.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/telemetria-base.js"></script>
+<script src="../assets/bases.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <div id="appSidebarMount"></div>
 <div class="menu-overlay" id="menuOverlay" onclick="fecharMenuLateral()"></div>
 <div class="container app-container">
   <div class="card">
-    <h1>🌱 Analisador de Ocorrências — Tratos</h1>
+    <div class="agrovision-eyebrow">AGROVISION <span>/</span> TELEMETRIA</div>
+    <h1>Tratos</h1>
     <div class="subtitle">
-      Analise as ocorrências de equipamentos de tratos com a mesma estrutura de dados, mapas, filtros, insights e relatórios da colhedora.
+      Selecione um arquivo CSV/TXT de telemetria para processar arquivos grandes sem carregar tudo na memória.
       O campo abaixo continua disponível para colagens menores.
     </div>
 
-    <div class="upload-row" style="margin-bottom:12px;align-items:center">
-      <label class="file-label">
-        📂 Subir e salvar base de telemetria
-        <input type="file" id="arquivoTelemetria" accept=".csv,.txt" style="display:none" onchange="selecionarArquivoTelemetria(event)">
-      </label>
-      <span id="statusTelemetria" class="badge">Nenhuma base salva</span>
-      <button type="button" class="secondary" id="btnRemoverBaseTelemetria" onclick="removerBaseTelemetria()" style="display:none">🗑️ Remover base salva</button>
+    <div class="base-telemetria-info" style="display:flex" id="baseTelemetriaInfo">
+      <div><strong>📡 Telemetria compartilhada — Tratos</strong><div id="baseTelemetriaResumo" class="helptext">Carregando arquivos armazenados...</div></div>
+      <div class="base-telemetria-badge" id="baseTelemetriaBadge">Base compartilhada</div>
     </div>
-    <div id="baseTelemetriaInfo" class="base-telemetria-info" style="display:none">
-      <div><strong>🗄️ Base persistente</strong><div id="baseTelemetriaResumo" class="helptext"></div></div>
-      <div class="base-telemetria-badge" id="baseTelemetriaBadge">Pronta para análise</div>
-    </div>
-    <div class="periodo-telemetria" id="periodoTelemetria" style="display:none">
+    <div class="periodo-telemetria" id="periodoTelemetria" style="display:grid">
       <div>
         <label>📅 Data inicial</label>
         <input id="dataInicialTelemetria" type="date" onchange="validarPeriodoTelemetria()">
@@ -543,15 +777,13 @@ let ocorrenciaMapaAtual = null;
       </div>
       <div class="periodo-disponivel" id="periodoDisponivelTelemetria"></div>
     </div>
-
+    <div class="helptext" id="statusTelemetria" style="margin:0 0 12px">A telemetria é adicionada em 🗄️ Bases → Telemetria → Tratos.</div>
     <div class="progress-wrap" id="progressoWrap" style="display:none">
       <div class="progress-bar"><div id="progressoTelemetria" class="progress-fill"></div></div>
       <div id="progressoTexto" class="helptext">Preparando arquivo...</div>
     </div>
 
-    <textarea id="dados" placeholder="Cole aqui a tabela completa copiada do Excel..."></textarea>
-
-    <div class="controls controls-tratos" style="margin-top:14px">
+    <div class="controls" style="margin-top:14px">
       <div>
         <label title="Pontos abaixo deste valor não entram na ocorrência">Velocidade mínima</label>
         <input id="minVel" type="number" value="1" step="0.1">
@@ -601,108 +833,6 @@ let ocorrenciaMapaAtual = null;
     <div id="analiseMeta" class="analise-meta" style="display:none"><span id="analiseMetaTexto">Pronto</span><span id="analiseMetaFiltro"></span></div>
     <div id="colunas" class="columns"></div>
   </div>
-
-  <details class="card collapsible-card">
-    <summary>
-      <div class="collapsible-title">
-        <div class="collapsible-icon">📍</div>
-        <div class="collapsible-heading">
-          <h2>Blocos válidos <span style="font-family:Inter,sans-serif;font-size:12px;color:var(--texto-fraco);font-weight:600">(área liberada)</span></h2>
-          <div class="helptext">Base geográfica usada para validar e relacionar as ocorrências.</div>
-        </div>
-        <span id="statusBlocosResumo" class="badge collapsible-status">Nenhum arquivo carregado</span>
-      </div>
-    </summary>
-    <div class="collapsible-content"><div class="subtitle" style="margin-bottom:14px">
-      Envie o arquivo com os blocos (exportado da tabela <code>SHAPE_GERAL_TEREOS</code>) para validar se cada ocorrência
-      está dentro de um bloco. Aceita <strong>CSV</strong> ou <strong>JSON</strong>, com a coluna <strong>GEOMETRY</strong> em
-      formato <strong>WKT</strong> (ex: <code>POLYGON((...))</code>) ou <strong>GeoJSON</strong> — o sistema detecta sozinho.
-      Uma vez enviado, os blocos ficam salvos neste navegador e não precisam ser reenviados a cada análise.
-    </div>
-    <div class="upload-row">
-      <label class="file-label">
-        📂 Selecionar arquivo de blocos
-        <input type="file" id="arquivoBlocos" accept=".csv,.json,.txt" style="display:none" onchange="carregarArquivoBlocos(event)">
-      </label>
-      <button class="secondary" onclick="limparBlocos()">🗑️ Remover blocos salvos</button>
-      <span id="statusBlocos" class="badge">Nenhum bloco carregado</span>
-    </div>
-    <div class="helptext">
-      Colunas reconhecidas (nomes flexíveis, maiúsc./minúsc. e acentos não importam):
-      <strong>GLEBA</strong>, <strong>BLOCO</strong>, <strong>TALHAO</strong>, <strong>UNIDADE</strong>, <strong>GEOMETRY</strong>.
-      Em JSON, também aceita uma lista de <em>Features</em> no padrão GeoJSON (<code>geometry</code> + <code>properties</code>).
-    </div>
-    </div>
-  </details>
-
-  <details class="card collapsible-card">
-    <summary>
-      <div class="collapsible-title">
-        <div class="collapsible-icon">🌱</div>
-        <div class="collapsible-heading">
-          <h2>Base de estimativas de cana</h2>
-          <div class="helptext">Produção estimada utilizada no cálculo das toneladas.</div>
-        </div>
-        <span id="statusProdutividadeResumo" class="badge collapsible-status">Nenhum arquivo carregado</span>
-      </div>
-    </summary>
-    <div class="collapsible-content"><div class="subtitle" style="margin-bottom:14px">
-      Envie a base de estimativas por talhão para deixar os dados salvos neste navegador.
-      Essa base será usada para relacionar <strong>SAFRA + GLEBA + BLOCO + TALHÃO</strong>
-      com a telemetria GPS. Quando disponível, o cálculo usa a <strong>produção estimada do bloco</strong> e distribui as toneladas proporcionalmente aos metros trabalhados na ocorrência.
-    </div>
-    <div class="upload-row">
-      <label class="file-label">
-        📂 Selecionar arquivo de produtividade
-        <input type="file" id="arquivoProdutividade" accept=".csv,.json,.txt" style="display:none" onchange="carregarArquivoProdutividade(event)">
-      </label>
-      <button class="secondary" onclick="limparProdutividade()">🗑️ Remover produtividade salva</button>
-      <span id="statusProdutividade" class="badge">Nenhuma base carregada</span>
-    </div>
-    <div class="helptext">
-      Aceita <strong>CSV</strong>, <strong>TXT</strong> ou <strong>JSON</strong>. A base pode conter, entre outras,
-      as colunas <strong>SK_ESTIMATIVAS</strong>, <strong>DS_ANO_SAFRA</strong>, <strong>DS_GLEBA</strong>,
-      <strong>DS_BLOCO</strong>, <strong>DS_TALHAO</strong>, <strong>DH_DATA_ESTIMATIVA</strong>,
-      <strong>VL_AREA</strong>, <strong>VL_ESPACAMENTO_TALHAO</strong>, <strong>VL_PRODUTIVIDADE</strong>
-      e <strong>VL_PRODUCAO_ESTIMADA</strong>. Os dados ficam salvos neste navegador e não precisam ser reenviados
-      a cada análise.
-    </div>
-    <div class="upload-row" style="margin-top:12px">
-      <button class="secondary" onclick="testarVinculoProdutividade()">🔎 Testar vínculo e cálculo</button>
-      <span id="diagnosticoProdutividade" class="helptext" style="margin:0"></span>
-    </div>
-    </div>
-  </details>
-
-  <details class="card collapsible-card">
-    <summary>
-      <div class="collapsible-title">
-        <div class="collapsible-icon">🌧️</div>
-        <div class="collapsible-heading">
-          <h2>Base de chuva <span style="font-family:Inter,sans-serif;font-size:12px;color:var(--texto-fraco);font-weight:600">(chuva diária por unidade e bloco)</span></h2>
-          <div class="helptext">Relaciona a chuva diária com a telemetria por data + unidade + bloco.</div>
-        </div>
-        <span id="statusChuvaResumo" class="badge collapsible-status">Nenhuma base carregada</span>
-      </div>
-    </summary>
-    <div class="collapsible-content">
-      <div class="subtitle" style="margin-bottom:14px">
-        Envie a base CSV com <strong>CD_UNIDADE</strong>, <strong>CD_BLOCO</strong>, <strong>DATA_CHUVA</strong>, <strong>SAFRA</strong> e <strong>TOTAL_CHUVA_DIA</strong>.
-        A chuva será vinculada automaticamente a cada ocorrência pela <strong>data + unidade + bloco</strong>.
-      </div>
-      <div class="upload-row">
-        <label class="file-label">
-          📂 Selecionar arquivo de chuva
-          <input type="file" id="arquivoChuva" accept=".csv,.txt" style="display:none" onchange="carregarArquivoChuva(event)">
-        </label>
-        <button class="secondary" onclick="limparChuva()">🗑️ Remover chuva salva</button>
-        <span id="statusChuva" class="badge">Nenhuma base carregada</span>
-      </div>
-      <div class="helptext" style="margin-top:10px">
-        Formato esperado: <strong>DATA_CHUVA = aaaa/mm/dd</strong>, <strong>SAFRA = 2026</strong> e <strong>TOTAL_CHUVA_DIA = 0.00</strong>.
-      </div>
-    </div>
-  </details>
 
   <div class="summary" id="resumo" style="display:none">
     <div class="metric">Ocorrências<strong id="mOcorrencias">0</strong></div>
@@ -778,7 +908,7 @@ let ocorrenciaMapaAtual = null;
 <div class="card" id="resultadoCard" style="display:none">
     <h2>Ocorrências encontradas</h2>
     <small>
-      Regra da ocorrência: Velocidade ≥ mínima + Pressão ≥ mínima + Grupo de Operação/Operação selecionados.
+      Regra da ocorrência: Tipo de Equipamento = Cit Tratos + Velocidade ≥ mínima + Grupo de Operação/Operação selecionados.
       A sequência é interrompida por gap maior que o limite, troca de equipamento ou mudança de classificação.
       <br><strong>Toneladas:</strong> mantém o cálculo proporcional já existente quando houver base de produtividade vinculada ao bloco.
     </small>
@@ -1135,563 +1265,6 @@ function parseData(v){
   return isNaN(d) ? null : d;
 }
 
-/* ---------- Blocos válidos (geometria) ---------- */
-const IDB_NOME="telemetria_blocos_db";
-const IDB_STORE="blocos";
-const IDB_STORE_PRODUTIVIDADE="produtividade";
-const IDB_STORE_CHUVA="chuva";
-let blocos=[]; // {label, gleba, bloco, talhao, unidade, polygons:[[[ [lon,lat], ... ], ...anéis], ...], bbox:{minLon,maxLon,minLat,maxLat}}
-
-// Blocos podem somar dezenas de MB (muitos vértices), o que estoura o limite do
-// localStorage (~5-10MB). Por isso usamos IndexedDB, que guarda os blocos já
-// processados (sem precisar reprocessar o CSV/JSON a cada abertura da página).
-function abrirBlocosDB(){
-  return new Promise((resolve,reject)=>{
-    const req=indexedDB.open(IDB_NOME,3);
-    req.onupgradeneeded=()=>{
-      const db=req.result;
-      if(!db.objectStoreNames.contains(IDB_STORE)){
-        db.createObjectStore(IDB_STORE);
-      }
-      if(!db.objectStoreNames.contains(IDB_STORE_PRODUTIVIDADE)){
-        db.createObjectStore(IDB_STORE_PRODUTIVIDADE);
-      }
-      if(!db.objectStoreNames.contains(IDB_STORE_CHUVA)){
-        db.createObjectStore(IDB_STORE_CHUVA);
-      }
-    };
-    req.onsuccess=()=>resolve(req.result);
-    req.onerror=()=>reject(req.error);
-  });
-}
-
-async function salvarBlocosDB(lista){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE,"readwrite");
-    tx.objectStore(IDB_STORE).put(lista,"atual");
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
-  });
-}
-
-async function carregarBlocosDB(){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE,"readonly");
-    const req=tx.objectStore(IDB_STORE).get("atual");
-    req.onsuccess=()=>resolve(req.result||null);
-    req.onerror=()=>reject(req.error);
-  });
-}
-
-async function limparBlocosDB(){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE,"readwrite");
-    tx.objectStore(IDB_STORE).delete("atual");
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
-  });
-}
-
-async function salvarProdutividadeDB(lista){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE_PRODUTIVIDADE,"readwrite");
-    tx.objectStore(IDB_STORE_PRODUTIVIDADE).put(lista,"atual");
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
-  });
-}
-
-async function carregarProdutividadeDB(){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE_PRODUTIVIDADE,"readonly");
-    const req=tx.objectStore(IDB_STORE_PRODUTIVIDADE).get("atual");
-    req.onsuccess=()=>resolve(req.result||null);
-    req.onerror=()=>reject(req.error);
-  });
-}
-
-async function limparProdutividadeDB(){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE_PRODUTIVIDADE,"readwrite");
-    tx.objectStore(IDB_STORE_PRODUTIVIDADE).delete("atual");
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
-  });
-}
-
-let chuva=[];
-
-function atualizarStatusChuva(mensagem, classe){
-  const el=document.getElementById("statusChuva");
-  const resumo=document.getElementById("statusChuvaResumo");
-  if(mensagem){
-    if(el){el.textContent=mensagem;el.className="badge "+(classe||"");}
-    if(resumo){resumo.textContent=mensagem;resumo.className="badge "+(classe||"")+" collapsible-status";}
-    return;
-  }
-  const txt=chuva.length ? `${chuva.length.toLocaleString("pt-BR")} registro(s) de chuva carregado(s) e salvo(s) neste navegador` : "Nenhuma base carregada";
-  if(el){el.textContent=txt;el.className="badge "+(chuva.length?"ok":"");}
-  if(resumo){resumo.textContent=txt;resumo.className="badge "+(chuva.length?"ok":"")+" collapsible-status";}
-}
-
-async function salvarChuvaDB(lista){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE_CHUVA,"readwrite");
-    tx.objectStore(IDB_STORE_CHUVA).put(lista,"atual");
-    tx.oncomplete=()=>{db.close();resolve();};
-    tx.onerror=()=>{db.close();reject(tx.error);};
-  });
-}
-async function carregarChuvaDB(){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE_CHUVA,"readonly");
-    const req=tx.objectStore(IDB_STORE_CHUVA).get("atual");
-    req.onsuccess=()=>{db.close();resolve(req.result||null);};
-    req.onerror=()=>{db.close();reject(req.error);};
-  });
-}
-async function limparChuvaDB(){
-  const db=await abrirBlocosDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_STORE_CHUVA,"readwrite");
-    tx.objectStore(IDB_STORE_CHUVA).delete("atual");
-    tx.oncomplete=()=>{db.close();resolve();};
-    tx.onerror=()=>{db.close();reject(tx.error);};
-  });
-}
-
-function normalizarDataChuva(v){
-  const x=String(v??"").trim();
-  let m=x.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-  if(!m) return "";
-  return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
-}
-function numeroChuva(v){
-  if(v===null||v===undefined||String(v).trim()==="") return 0;
-  return numero(v);
-}
-function processarConteudoChuva(texto,nomeArquivo){
-  atualizarStatusChuva("Lendo arquivo...","warn");
-  let linhas;
-  try{linhas=linhasDeCSV(texto.trim());}catch(e){alert("Não foi possível interpretar a base de chuva: "+e.message);atualizarStatusChuva();return;}
-  if(!linhas.length){alert("Nenhum registro de chuva foi encontrado no arquivo.");atualizarStatusChuva();return;}
-  chuva=linhas.map(obj=>({
-    cd_unidade:String(obterCampo(obj,["cd_unidade","unidade"])??"").trim(),
-    cd_bloco:String(obterCampo(obj,["cd_bloco","bloco"])??"").trim(),
-    dataChuva:normalizarDataChuva(obterCampo(obj,["data_chuva","datachuva"])),
-    safra:String(obterCampo(obj,["safra","ano_safra","ds_ano_safra"])??"").trim(),
-    totalChuvaDia:numeroChuva(obterCampo(obj,["total_chuva_dia","totalchuviadia","chuva_dia","chuva"]))
-  })).filter(x=>x.dataChuva && x.cd_unidade && x.cd_bloco);
-  salvarChuvaDB(chuva).then(()=>atualizarStatusChuva()).catch(e=>atualizarStatusChuva(`${chuva.length.toLocaleString("pt-BR")} registro(s) carregado(s) nesta sessão (não foi possível salvar permanentemente: ${e.message||e})`,"warn"));
-}
-function carregarArquivoChuva(event){
-  const file=event.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>processarConteudoChuva(String(reader.result),file.name);
-  reader.onerror=()=>alert("Não foi possível ler o arquivo de chuva.");
-  reader.readAsText(file,"UTF-8");
-}
-async function limparChuva(){
-  chuva=[];
-  try{await limparChuvaDB();}catch(e){}
-  atualizarStatusChuva();
-  const input=document.getElementById("arquivoChuva");if(input)input.value="";
-}
-function chaveChuva(unidade,bloco,dia){
-  return `${normalizarChaveRelacionamento(unidade)}|${normalizarChaveRelacionamento(bloco)}|${dia}`;
-}
-function obterChuvaDaOcorrencia(r){
-  if(!chuva.length||!r)return null;
-  const dia=dataSomenteDia(r.data);
-  const alvo=chaveChuva(r.unidade,r.bloco,dia);
-  let candidatos=chuva.filter(x=>chaveChuva(x.cd_unidade,x.cd_bloco,x.dataChuva)===alvo);
-  if(!candidatos.length && r.blocoLabel) candidatos=chuva.filter(x=>chaveChuva(x.cd_unidade,x.cd_bloco,x.dataChuva)===chaveChuva(r.unidade,r.blocoLabel,dia));
-  if(!candidatos.length)return null;
-  const total=candidatos.reduce((s,x)=>s+(Number(x.totalChuvaDia)||0),0);
-  return {totalChuvaDia:total,safra:candidatos[0].safra||"",registros:candidatos.length};
-}
-function formatarChuvaCelula(r){
-  const c=obterChuvaDaOcorrencia(r);
-  if(!c)return '<span class="chuva-sem-dado">—</span>';
-  return `<span class="chuva-badge">🌧️ ${Number(c.totalChuvaDia||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})} mm</span>`;
-}
-
-let produtividade=[];
-
-function atualizarStatusProdutividade(mensagem, classe){
-  const el=document.getElementById("statusProdutividade");
-  if(!el) return;
-
-  if(mensagem){
-    el.textContent=mensagem;
-    el.className="badge "+(classe||"");
-    const resumo=document.getElementById("statusProdutividadeResumo");
-    if(resumo){resumo.textContent=mensagem;resumo.className="badge "+(classe||"")+" collapsible-status";}
-    return;
-  }
-
-  if(!produtividade.length){
-    el.textContent="Nenhuma base carregada";
-    el.className="badge";
-    const resumo=document.getElementById("statusProdutividadeResumo");
-    if(resumo){resumo.textContent=el.textContent;resumo.className="badge collapsible-status";}
-    return;
-  }
-
-  el.textContent=`${produtividade.length.toLocaleString("pt-BR")} registro(s) de produtividade carregado(s) e salvo(s) neste navegador`;
-  el.className="badge ok";
-  const resumo=document.getElementById("statusProdutividadeResumo");
-  if(resumo){resumo.textContent=el.textContent;resumo.className="badge ok collapsible-status";}
-}
-
-async function processarConteudoProdutividade(texto, nomeArquivo){
-  const t=texto.trim();
-  let linhas;
-
-  atualizarStatusProdutividade("Lendo arquivo...", "warn");
-
-  try{
-    if(t.startsWith("[") || t.startsWith("{") || /\.json$/i.test(nomeArquivo||"")){
-      linhas=linhasDeJSON(t);
-    }else{
-      linhas=linhasDeCSV(t);
-    }
-  }catch(e){
-    alert("Não foi possível interpretar o arquivo de produtividade: "+e.message);
-    atualizarStatusProdutividade();
-    return;
-  }
-
-  if(!linhas.length){
-    alert("Nenhum registro de produtividade foi encontrado no arquivo.");
-    atualizarStatusProdutividade();
-    return;
-  }
-
-  // Mantém os nomes normalizados para facilitar o futuro relacionamento
-  // entre safra, gleba, bloco e talhão.
-  produtividade=linhas.map(obj=>({
-    ...obj,
-    sk_estimativas: obterCampo(obj,["sk_estimativas","sk_estimativa"]),
-    ds_ano_safra: obterCampo(obj,["ds_ano_safra","ano_safra","anosafra","safra"]),
-    ds_gleba: obterCampo(obj,["ds_gleba","gleba"]),
-    ds_bloco: obterCampo(obj,["ds_bloco","bloco"]),
-    ds_talhao: obterCampo(obj,["ds_talhao","talhao"]),
-    vl_area: obterCampo(obj,["vl_area","area","area_ha","areaha","area(ha)"]),
-    vl_espacamento_talhao: obterCampo(obj,["vl_espacamento_talhao","espacamento_talhao","espacamento"]),
-    vl_produtividade: obterCampo(obj,["vl_produtividade","produtividade"]),
-    vl_producao_estimada: obterCampo(obj,["vl_producao_estimada","producao_estimada","producao"]),
-    vl_producao_estimada_bloco: obterCampo(obj,["vl_producao_estimada_bloco","producao_estimada_bloco","producao_bloco"]),
-    vl_colheita_area_moagem: obterCampo(obj,["vl_colheita_area_moagem","colheita_area_moagem"]),
-    vl_tch_bloco: obterCampo(obj,["vl_tch_bloco","tch_bloco"]),
-    cd_status: obterCampo(obj,["cd_status","status"]),
-    ds_grupo_estimativa: obterCampo(obj,["ds_grupo_estimativa","grupo_estimativa"]),
-    dh_data_estimativa: obterCampo(obj,["dh_data_estimativa","data_estimativa"]),
-  }));
-
-  atualizarStatusProdutividade(
-    `Salvando ${produtividade.length.toLocaleString("pt-BR")} registro(s) no navegador...`,
-    "warn"
-  );
-
-  try{
-    await salvarProdutividadeDB(produtividade);
-    atualizarStatusProdutividade();
-  }catch(e){
-    atualizarStatusProdutividade(
-      `${produtividade.length.toLocaleString("pt-BR")} registro(s) carregado(s) nesta sessão (não foi possível salvar permanentemente: ${e.message||e})`,
-      "warn"
-    );
-  }
-}
-
-function carregarArquivoProdutividade(event){
-  const file=event.target.files[0];
-  if(!file) return;
-
-  const reader=new FileReader();
-  reader.onload=()=>processarConteudoProdutividade(String(reader.result), file.name);
-  reader.onerror=()=>alert("Não foi possível ler o arquivo de produtividade.");
-  reader.readAsText(file, "UTF-8");
-}
-
-async function limparProdutividade(){
-  produtividade=[];
-  try{ await limparProdutividadeDB(); }catch(e){}
-  atualizarStatusProdutividade();
-  const input=document.getElementById("arquivoProdutividade");
-  if(input) input.value="";
-}
-
-function normalizarChave(v){
-  return normalizarTexto(v).replace(/\s+/g,"");
-}
-
-// Extrai todos os números de uma string "x y, x y, x y" (2D) ou "x y z, x y z, ..." (3D/4D)
-// -> [[x,y],[x,y],...], ignorando dimensões extras (Z, M) além das 2 primeiras
-function parsearParesXY(txt, dim){
-  const nums=(txt.match(/-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g)||[]).map(Number);
-  const passo=dim||2;
-  const pares=[];
-  for(let i=0;i+1<nums.length;i+=passo) pares.push([nums[i],nums[i+1]]);
-  return pares;
-}
-
-// Recebe o conteúdo bruto de WKT (POLYGON(...), MULTIPOLYGON(...), e variantes com Z/M/ZM
-// como MULTIPOLYGONZ) e devolve lista de polígonos, cada polígono = lista de anéis,
-// cada anel = lista de [lon,lat]
-function parsearWKT(txt){
-  const s=String(txt).trim().replace(/^SRID=\d+;/i,"");
-  const m=s.match(/^\s*(MULTIPOLYGON|POLYGON)\s*([ZM]{1,2})?\s*\(/i);
-  if(!m) return [];
-  const tipo=m[1].toUpperCase();
-  const dim=2+(m[2]?m[2].length:0); // sufixo Z ou M soma 1 dimensão, ZM soma 2
-
-  if(tipo==="MULTIPOLYGON"){
-    const corpo=s.slice(s.indexOf("(")+1, s.lastIndexOf(")"));
-    // separa cada polígono pelo parênteses de nível mais externo
-    const poligonos=[];
-    let prof=0, atual="";
-    for(const ch of corpo){
-      if(ch==="(") { if(prof>0) atual+=ch; prof++; if(prof===1) atual=""; continue; }
-      if(ch===")") { prof--; if(prof===0){ poligonos.push(atual); continue;} atual+=ch; continue; }
-      if(prof>0) atual+=ch;
-    }
-    return poligonos.map(p=>extrairAneis(p,dim));
-  }
-
-  if(tipo==="POLYGON"){
-    const corpo=s.slice(s.indexOf("(")+1, s.lastIndexOf(")"));
-    return [extrairAneis(corpo,dim)];
-  }
-
-  return [];
-}
-
-// corpo = "(x y, x y, ...),(x y, x y, ...)" -> lista de anéis [[lon,lat],...]
-function extrairAneis(corpo, dim){
-  const aneis=[];
-  let prof=0, atual="";
-  for(const ch of corpo){
-    if(ch==="("){ prof++; if(prof===1){atual="";continue;} atual+=ch; continue; }
-    if(ch===")"){ prof--; if(prof===0){ aneis.push(parsearParesXY(atual,dim)); continue;} atual+=ch; continue; }
-    if(prof>0) atual+=ch;
-  }
-  if(!aneis.length && corpo.trim()) aneis.push(parsearParesXY(corpo,dim));
-  return aneis;
-}
-
-// Recebe geometria em GeoJSON (objeto já parseado) e devolve lista de polígonos (mesmo formato de parsearWKT)
-function parsearGeoJSON(geo){
-  if(!geo) return [];
-  if(geo.type==="Feature") return parsearGeoJSON(geo.geometry);
-  if(geo.type==="FeatureCollection") return (geo.features||[]).flatMap(f=>parsearGeoJSON(f.geometry));
-  if(geo.type==="Polygon") return [geo.coordinates];
-  if(geo.type==="MultiPolygon") return geo.coordinates;
-  return [];
-}
-
-// Detecta o formato (WKT, GeoJSON em texto, ou GeoJSON já como objeto) e devolve lista de polígonos
-function parsearGeometria(valor){
-  if(valor===null || valor===undefined) return [];
-
-  if(typeof valor==="object"){
-    return parsearGeoJSON(valor);
-  }
-
-  let s=String(valor).trim();
-  if(!s) return [];
-
-  if(s.startsWith("{") || s.startsWith("[")){
-    try{ return parsearGeoJSON(JSON.parse(s)); }catch(e){ return []; }
-  }
-  if(/^(SRID=\d+;)?\s*(POLYGON|MULTIPOLYGON)/i.test(s)){
-    return parsearWKT(s);
-  }
-  return [];
-}
-
-function calcularBBox(polygons){
-  let minLon=Infinity,maxLon=-Infinity,minLat=Infinity,maxLat=-Infinity;
-  for(const poly of polygons){
-    for(const anel of poly){
-      for(const [lon,lat] of anel){
-        if(lon<minLon)minLon=lon; if(lon>maxLon)maxLon=lon;
-        if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
-      }
-    }
-  }
-  return {minLon,maxLon,minLat,maxLat};
-}
-
-function pontoNoAnel(lon,lat,anel){
-  let dentro=false;
-  for(let i=0,j=anel.length-1;i<anel.length;j=i++){
-    const [xi,yi]=anel[i], [xj,yj]=anel[j];
-    const intersecta=((yi>lat)!==(yj>lat)) && (lon < (xj-xi)*(lat-yi)/(yj-yi)+xi);
-    if(intersecta) dentro=!dentro;
-  }
-  return dentro;
-}
-
-function pontoNoPoligono(lon,lat,poly){
-  if(!poly.length) return false;
-  if(!pontoNoAnel(lon,lat,poly[0])) return false;
-  for(let i=1;i<poly.length;i++){
-    if(pontoNoAnel(lon,lat,poly[i])) return false; // caiu num buraco
-  }
-  return true;
-}
-
-function encontrarBloco(lon,lat){
-  if(!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
-  for(const b of blocos){
-    const bb=b.bbox;
-    if(lon<bb.minLon||lon>bb.maxLon||lat<bb.minLat||lat>bb.maxLat) continue;
-    for(const poly of b.polygons){
-      if(pontoNoPoligono(lon,lat,poly)) return b;
-    }
-  }
-  return null;
-}
-
-function atualizarStatusBlocos(mensagem, classe){
-  const el=document.getElementById("statusBlocos");
-  if(mensagem){
-    el.textContent=mensagem;
-    el.className="badge "+(classe||"");
-    return;
-  }
-  if(!blocos.length){
-    el.textContent="Nenhum bloco carregado";
-    el.className="badge";
-    const resumo=document.getElementById("statusBlocosResumo");
-    if(resumo){resumo.textContent=el.textContent;resumo.className="badge collapsible-status";}
-    return;
-  }
-  el.textContent=`${blocos.length.toLocaleString("pt-BR")} bloco(s) carregado(s) e salvo(s) neste navegador`;
-  el.className="badge ok";
-  const resumo=document.getElementById("statusBlocosResumo");
-  if(resumo){resumo.textContent=el.textContent;resumo.className="badge ok collapsible-status";}
-}
-
-function montarBlocosDeLinhas(linhas){
-  const resultado=[];
-  for(const obj of linhas){
-    const geomBruta=obj.geometry ?? obj.geom ?? obj.the_geom ?? "";
-    const polygons=parsearGeometria(geomBruta);
-    if(!polygons.length) continue;
-
-    const anoSafra=obterCampo(obj,["ano_safra","anosafra","safra"]);
-    const bloco=obterCampo(obj,["bloco"]);
-    const gleba=obterCampo(obj,["gleba"]);
-    const talhao=obterCampo(obj,["talhao"]);
-    const unidade=obterCampo(obj,["unidade"]);
-    const areaHa=numero(obterCampo(obj,["areaha","area_ha","area","area(ha)"]));
-
-    const label=[unidade,gleba,bloco,talhao].filter(Boolean).join(" / ") || "Bloco sem identificação";
-
-    resultado.push({
-      label, anoSafra, bloco, gleba, talhao, unidade,
-      areaHa:Number.isFinite(areaHa) ? areaHa : null,
-      polygons,
-      bbox:calcularBBox(polygons)
-    });
-  }
-  return resultado;
-}
-
-function linhasDeCSV(texto){
-  const linhas=texto.split(/\r?\n/).filter(l=>l.trim()!=="");
-  if(linhas.length<2) return [];
-  const sep=detectarSeparador(linhas[0]);
-  const headers=dividirLinha(linhas[0],sep).map(normalizarChave);
-  const objetos=[];
-  for(let i=1;i<linhas.length;i++){
-    const row=dividirLinha(linhas[i],sep);
-    const obj={};
-    headers.forEach((h,idx)=>{ obj[h]=row[idx]; });
-    objetos.push(obj);
-  }
-  return objetos;
-}
-
-function linhasDeJSON(texto){
-  const dado=JSON.parse(texto);
-  const lista=Array.isArray(dado)?dado:(dado.features||dado.rows||dado.data||[dado]);
-  return lista.map(item=>{
-    if(item && item.type==="Feature"){
-      const props=item.properties||{};
-      const obj={geometry:item.geometry};
-      for(const k in props) obj[normalizarChave(k)]=props[k];
-      return obj;
-    }
-    const obj={};
-    for(const k in item) obj[normalizarChave(k)]=item[k];
-    return obj;
-  });
-}
-
-async function processarConteudoBlocos(texto, nomeArquivo){
-  const t=texto.trim();
-  let linhas;
-  atualizarStatusBlocos("Lendo arquivo...", "warn");
-  try{
-    if(t.startsWith("[") || t.startsWith("{") || /\.json$/i.test(nomeArquivo||"")){
-      linhas=linhasDeJSON(t);
-    }else{
-      linhas=linhasDeCSV(t);
-    }
-  }catch(e){
-    alert("Não foi possível interpretar o arquivo de blocos: "+e.message);
-    atualizarStatusBlocos();
-    return;
-  }
-
-  const novosBlocos=montarBlocosDeLinhas(linhas);
-  if(!novosBlocos.length){
-    alert("Nenhum bloco com geometria válida foi encontrado no arquivo. Confira se a coluna GEOMETRY está em formato WKT (POLYGON/MULTIPOLYGON) ou GeoJSON.");
-    atualizarStatusBlocos();
-    return;
-  }
-
-  blocos=novosBlocos;
-  atualizarStatusBlocos(`Salvando ${blocos.length.toLocaleString("pt-BR")} bloco(s) no navegador...`, "warn");
-  try{
-    await salvarBlocosDB(blocos);
-    atualizarStatusBlocos();
-  }catch(e){
-    atualizarStatusBlocos(
-      `${blocos.length.toLocaleString("pt-BR")} bloco(s) carregado(s) nesta sessão (não foi possível salvar permanentemente: ${e.message||e})`,
-      "warn"
-    );
-  }
-}
-
-function carregarArquivoBlocos(event){
-  const file=event.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=()=>processarConteudoBlocos(String(reader.result), file.name);
-  reader.onerror=()=>alert("Não foi possível ler o arquivo selecionado.");
-  reader.readAsText(file, "UTF-8");
-}
-
-async function limparBlocos(){
-  blocos=[];
-  try{ await limparBlocosDB(); }catch(e){}
-  atualizarStatusBlocos();
-  document.getElementById("arquivoBlocos").value="";
-}
-
 function distancia(lat1,lon1,lat2,lon2){
   const R=6371000;
   const toRad=x=>x*Math.PI/180;
@@ -1730,7 +1303,8 @@ function dividirLinha(linha, sep){
 function encontrarColunas(headers){
   const h=headers.map(normalizarTexto);
   function achar(fn){const i=h.findIndex(fn);return i>=0?i:-1;}
-  const equipamento=achar(x=>x==="equipamento"||x.includes("equipamento"));
+  const equipamento=achar(x=>x==="equipamento");
+  const tipoEquipamento=achar(x=>x==="tipo de equipamento"||x.includes("tipo equipamento"));
   const dataHora=achar(x=>(x.includes("data")&&x.includes("hora"))||x==="data hora");
   const grupoOperacao=achar(x=>x.includes("grupo")&&x.includes("operacao"));
   const operacao=achar(x=>x==="operacao"||x==="operacoes"||(x.includes("operacao")&&!x.includes("grupo")));
@@ -1739,9 +1313,8 @@ function encontrarColunas(headers){
   const operador=achar(x=>x==="operador"||x.includes("operador")||x.includes("motorista"));
   const latitude=achar(x=>x==="latitude"||x.includes("latitude"));
   const longitude=achar(x=>x==="longitude"||x.includes("longitude"));
-  const pressao=achar(x=>(x.includes("press")&&x.includes("corte"))||x.includes("pressao de corte"));
   const velocidade=achar(x=>x==="velocidade"||x.includes("velocidade"));
-  return {equipamento,dataHora,grupoOperacao,operacao,grupo,unidade,operador,latitude,longitude,pressao,velocidade};
+  return {equipamento,tipoEquipamento,dataHora,grupoOperacao,operacao,grupo,unidade,operador,latitude,longitude,velocidade};
 }
 
 function formatarData(d){
@@ -1816,215 +1389,6 @@ function obterCampo(obj, nomes){
   return "";
 }
 
-function numeroProdutividade(v){
-  if(v === null || v === undefined || v === "") return NaN;
-  return numero(v);
-}
-
-function normalizarChaveRelacionamento(v){
-  if(v === null || v === undefined) return "";
-  return String(v).trim().replace(/\s+/g,"").toUpperCase();
-}
-
-function obterProdutividadeDoBloco(bloco){
-  if(!bloco || !produtividade.length) return null;
-
-  const ano=normalizarChaveRelacionamento(bloco.anoSafra);
-  const gleba=normalizarChaveRelacionamento(bloco.gleba);
-  const codBloco=normalizarChaveRelacionamento(bloco.bloco);
-  if(!gleba || !codBloco) return {
-    producaoEstimada:0, producaoEstimadaBloco:0, areaBlocoHa:0, metrosEquivalentes:0,
-    quantidadeTalhoes:0, registros:[], motivo:"Bloco sem GLEBA/BLOCO para relacionamento"
-  };
-
-  const registros=produtividade.map((p,idx)=>({
-    p, idx,
-    ano:normalizarChaveRelacionamento(obterCampo(p,["ds_ano_safra","ano_safra","anosafra","safra"])),
-    gleba:normalizarChaveRelacionamento(obterCampo(p,["ds_gleba","gleba"])),
-    bloco:normalizarChaveRelacionamento(obterCampo(p,["ds_bloco","bloco"])),
-    talhao:normalizarChaveRelacionamento(obterCampo(p,["ds_talhao","talhao"])),
-    area:numeroProdutividade(obterCampo(p,["vl_area","area","area_ha","areaha","area(ha)"])),
-    espacamento:numeroProdutividade(obterCampo(p,["vl_espacamento_talhao","espacamento_talhao","espacamento"])),
-    producao:numeroProdutividade(obterCampo(p,["vl_producao_estimada","producao_estimada","producao"])),
-    producaoBloco:numeroProdutividade(obterCampo(p,["vl_producao_estimada_bloco","producao_estimada_bloco","producao_bloco"])),
-    tchBloco:numeroProdutividade(obterCampo(p,["vl_tch_bloco","tch_bloco"])),
-    areaMoagem:numeroProdutividade(obterCampo(p,["vl_colheita_area_moagem","colheita_area_moagem"])),
-    status:String(obterCampo(p,["cd_status","status"]) ?? "").trim().toUpperCase()
-  }));
-
-  // Relacionamento conservador: quando a ocorrência possui SAFRA,
-  // exigimos SAFRA + GLEBA + BLOCO. Só ignoramos a safra quando a
-  // própria ocorrência não possui essa informação. Assim, se não houver
-  // correspondência real, a ocorrência fica com 0 t.
-  let candidatos=ano
-    ? registros.filter(x=>x.gleba===gleba && x.bloco===codBloco && x.ano===ano)
-    : registros.filter(x=>x.gleba===gleba && x.bloco===codBloco);
-
-  // CD_STATUS indica se o talhão é válido. Se houver registros explicitamente
-  // ativos (1/S/SIM/ATIVO) no conjunto encontrado, usamos somente os ativos.
-  // Assim um talhão desativado não entra na estimativa do bloco.
-  const ativos=candidatos.filter(x=>["1","S","SIM","ATIVO","ATIVA","VALIDO","VÁLIDO"].includes(x.status));
-  if(ativos.length) candidatos=ativos;
-
-  const producaoValidos=candidatos.filter(x=>Number.isFinite(x.producao) && x.producao>0);
-  const areaValidos=candidatos.filter(x=>Number.isFinite(x.area) && x.area>0);
-  const espacamentoValidos=areaValidos.filter(x=>Number.isFinite(x.espacamento) && x.espacamento>0);
-  const blocoValidos=candidatos.filter(x=>Number.isFinite(x.producaoBloco) && x.producaoBloco>0);
-
-  // A nova tabela já traz a produção consolidada do bloco. Como esse valor
-  // pode se repetir em cada talhão, NUNCA somamos essas linhas. Usamos o
-  // maior valor encontrado (equivalente ao valor único quando consistente).
-  const valoresBloco=blocoValidos.map(x=>x.producaoBloco).sort((a,b)=>a-b);
-  const producaoEstimadaBloco=valoresBloco.length ? valoresBloco[valoresBloco.length-1] : 0;
-
-  // Fallback para bases em que a coluna de bloco não esteja preenchida.
-  const producaoEstimada=producaoValidos.reduce((a,x)=>a+x.producao,0);
-  const areaBlocoHa=areaValidos.reduce((a,x)=>a+x.area,0);
-  const metrosEquivalentes=espacamentoValidos.reduce((a,x)=>a+(x.area*10000)/x.espacamento,0);
-  const producaoBase=producaoEstimadaBloco>0 ? producaoEstimadaBloco : producaoEstimada;
-
-  let motivo="";
-  if(!candidatos.length) motivo="Nenhuma linha da estimativa bateu GLEBA + BLOCO (e SAFRA quando disponível).";
-  else if(!producaoBase) motivo="Encontrou o bloco, mas não há produção estimada positiva no bloco/talhão.";
-  else if(!metrosEquivalentes) motivo="Produção encontrada, porém não há espaçamento > 0 para calcular os metros equivalentes do bloco.";
-
-  return {
-    producaoEstimada:producaoBase,
-    producaoEstimadaBloco,
-    producaoEstimadaTalhoes:producaoEstimada,
-    areaBlocoHa,
-    metrosEquivalentes,
-    espacamentoM:metrosEquivalentes>0 ? (areaBlocoHa*10000)/metrosEquivalentes : NaN,
-    quantidadeTalhoes:candidatos.length,
-    quantidadeComProducao:producaoValidos.length,
-    quantidadeComProducaoBloco:blocoValidos.length,
-    quantidadeComEspacamento:espacamentoValidos.length,
-    registros:candidatos.map(x=>x.p),
-    candidatos,
-    motivo,
-    fonteProducao:producaoEstimadaBloco>0 ? "VL_PRODUCAO_ESTIMADA_BLOCO" : "VL_PRODUCAO_ESTIMADA"
-  };
-}
-
-function calcularToneladasEstimadas(metros, bloco, metrosBlocoFallback=0){
-  const info=obterProdutividadeDoBloco(bloco);
-  if(!info){
-    return {toneladas:0, percentualBloco:0, metrosBloco:0, info:null, metodo:"sem estimativa"};
-  }
-
-  if(!Number.isFinite(metros) || metros<=0){
-    return {toneladas:0, percentualBloco:0, metrosBloco:0, info, metodo:"sem metros"};
-  }
-
-  let metrosBloco=Number.isFinite(info.metrosEquivalentes) && info.metrosEquivalentes>0
-    ? info.metrosEquivalentes : 0;
-  let metodo=metrosBloco>0 ? "área ÷ espaçamento" : "";
-
-  // Quando existe produção para o bloco, mas o espaçamento está vazio/zero,
-  // usamos como alternativa os metros realmente percorridos dentro do bloco
-  // na telemetria. Isso mantém a proporcionalidade pela extensão trabalhada.
-  if(!(metrosBloco>0) && Number.isFinite(metrosBlocoFallback) && metrosBlocoFallback>0){
-    metrosBloco=metrosBlocoFallback;
-    metodo="metros reais da telemetria no bloco";
-  }
-
-  if(!(info.producaoEstimada>0)){
-    return {toneladas:0, percentualBloco:0, metrosBloco, info, metodo:"sem produção estimada"};
-  }
-
-  if(!(metrosBloco>0)){
-    return {toneladas:0, percentualBloco:0, metrosBloco:0, info, metodo:"sem referência de metros"};
-  }
-
-  const percentualBloco=metros/metrosBloco;
-  const toneladas=info.producaoEstimada*percentualBloco;
-
-  return {
-    toneladas,
-    percentualBloco,
-    metrosBloco,
-    info,
-    metodo,
-    fonteProducao:info.fonteProducao||"VL_PRODUCAO_ESTIMADA"
-  };
-}
-
-function testarVinculoProdutividade(){
-  const el=document.getElementById("diagnosticoProdutividade");
-  if(!el) return;
-  if(!produtividade.length){
-    el.textContent="⚠️ Carregue a base de produtividade primeiro.";
-    return;
-  }
-
-  let blocoTeste=blocos[0] || null;
-  if(!blocoTeste){
-    const p=produtividade[0];
-    blocoTeste={
-      anoSafra:obterCampo(p,["ds_ano_safra","ano_safra","safra"]),
-      gleba:obterCampo(p,["ds_gleba","gleba"]),
-      bloco:obterCampo(p,["ds_bloco","bloco"]),
-      talhao:obterCampo(p,["ds_talhao","talhao"])
-    };
-  }
-
-  const alvoAno=normalizarChaveRelacionamento(blocoTeste.anoSafra);
-  const alvoGleba=normalizarChaveRelacionamento(blocoTeste.gleba);
-  const alvoBloco=normalizarChaveRelacionamento(blocoTeste.bloco);
-
-  const regs=produtividade.map((p,idx)=>({
-    idx,
-    ano:normalizarChaveRelacionamento(obterCampo(p,["ds_ano_safra","ano_safra","anosafra","safra"])),
-    gleba:normalizarChaveRelacionamento(obterCampo(p,["ds_gleba","gleba"])),
-    bloco:normalizarChaveRelacionamento(obterCampo(p,["ds_bloco","bloco"])),
-    talhao:normalizarChaveRelacionamento(obterCampo(p,["ds_talhao","talhao"])),
-    area:numeroProdutividade(obterCampo(p,["vl_area","area","area_ha","areaha","area(ha)"])),
-    esp:numeroProdutividade(obterCampo(p,["vl_espacamento_talhao","espacamento_talhao","espacamento"])),
-    prod:numeroProdutividade(obterCampo(p,["vl_producao_estimada","producao_estimada","producao"]))
-  }));
-
-  const porGleba=regs.filter(x=>x.gleba===alvoGleba);
-  const porBloco=regs.filter(x=>x.bloco===alvoBloco);
-  const porGlebaBloco=regs.filter(x=>x.gleba===alvoGleba && x.bloco===alvoBloco);
-  const porTudo=regs.filter(x=>x.gleba===alvoGleba && x.bloco===alvoBloco && (!alvoAno || !x.ano || x.ano===alvoAno));
-
-  // DIAGNÓSTICO EXTRA: quando não há vínculo exato, mostramos quais blocos
-  // realmente existem na produtividade para a mesma gleba e quais valores
-  // de bloco contêm o texto procurado. Isso permite descobrir se a chave
-  // da geometria é 606F0001 enquanto a produtividade usa outro padrão.
-  const blocosDaGleba=[...new Set(porGleba.map(x=>x.bloco).filter(Boolean))].slice(0,30);
-  const blocosQueContem=[...new Set(regs
-    .filter(x=>x.bloco && (x.bloco.includes(alvoBloco) || alvoBloco.includes(x.bloco)))
-    .map(x=>`${x.gleba}/${x.bloco}`))].slice(0,30);
-
-  const info=obterProdutividadeDoBloco(blocoTeste);
-  const amostra=porGlebaBloco.slice(0,5).map(x=>
-    `#${x.idx}: safra=${x.ano||"-"}, gleba=${x.gleba||"-"}, bloco=${x.bloco||"-"}, talhão=${x.talhao||"-"}, área=${Number.isFinite(x.area)?x.area:"-"}, esp=${Number.isFinite(x.esp)?x.esp:"-"}, prod=${Number.isFinite(x.prod)?x.prod:"-"}`
-  );
-
-  const chavesPrimeira=produtividade[0] ? Object.keys(produtividade[0]) : [];
-  const valoresPrimeira=produtividade[0] ? chavesPrimeira.map(k=>`${k}=${String(produtividade[0][k] ?? "").slice(0,80)}`) : [];
-
-  const resumo=[
-    `TESTE DE VÍNCULO`,
-    `Geometria: safra=${blocoTeste.anoSafra||"-"} | gleba=${blocoTeste.gleba||"-"} | bloco=${blocoTeste.bloco||"-"} | talhão=${blocoTeste.talhao||"-"}`,
-    `Produtividade carregada=${produtividade.length}`,
-    `CHAVES DA PRIMEIRA LINHA: ${chavesPrimeira.join(" | ")}`,
-    `VALORES DA PRIMEIRA LINHA: ${valoresPrimeira.join(" | ")}`,
-    `Mesma GLEBA=${porGleba.length} | Mesmo BLOCO=${porBloco.length} | Mesma GLEBA+BLOCO=${porGlebaBloco.length} | Com SAFRA=${porTudo.length}`,
-    `Resultado atual: linhas=${info?.quantidadeTalhoes||0} | produção=${Number(info?.producaoEstimada||0).toLocaleString("pt-BR",{maximumFractionDigits:3})} t | área=${Number(info?.areaBlocoHa||0).toLocaleString("pt-BR",{maximumFractionDigits:3})} ha | metros eq.=${Number(info?.metrosEquivalentes||0).toLocaleString("pt-BR",{maximumFractionDigits:1})} m`,
-    info?.motivo || "OK",
-    amostra.length ? `AMOSTRA DAS LINHAS GLEBA+BLOCO:\n${amostra.join("\n")}` : `⚠️ Não existe nem uma linha na produtividade com GLEBA=${alvoGleba} e BLOCO=${alvoBloco}.`,
-    `BLOCOS EXISTENTES NA GLEBA ${alvoGleba}: ${blocosDaGleba.length ? blocosDaGleba.join(" | ") : "NENHUM"}`,
-    `BLOCOS COM TEXTO PARECIDO: ${blocosQueContem.length ? blocosQueContem.join(" | ") : "NENHUM"}`,
-    `Primeiras linhas da produtividade: ${regs.slice(0,5).map(x=>`#${x.idx} ${x.ano||"-"}/${x.gleba||"-"}/${x.bloco||"-"}`).join(" | ")}`
-  ];
-  el.style.whiteSpace="pre-wrap";
-  el.textContent=resumo.join("\n");
-}
-
-
-
 function formatarDuracao(ms){
   let total=Math.floor(ms/1000);
   let h=Math.floor(total/3600);
@@ -2056,69 +1420,60 @@ function escaparHTML(v){
 let arquivoTelemetriaSelecionado = null;
 let processamentoTelemetriaAtivo = false;
 let readerTelemetriaAtual = null;
+let telemetriaBaseSalva = null;
+let periodoTelemetriaSelecionado = {inicio:null,fim:null};
+const TIPO_TELEMETRIA_PAGINA = "tratos";
+
+function formatarBytes(bytes){ return window.telemetriaBase.fmtBytes(bytes); }
+function formatarDataInput(ms){ return window.telemetriaBase.inputDate(ms); }
+function formatarDataBR(ms){ return window.telemetriaBase.fmtDate(ms); }
+
+async function carregarBaseTelemetriaSalva(){
+  const lista=await window.telemetriaBase.listar(TIPO_TELEMETRIA_PAGINA);
+  telemetriaBaseSalva=lista.length?lista[lista.length-1]:null;
+  atualizarUIBaseTelemetria(lista);
+}
+
+async function atualizarUIBaseTelemetria(listaArg){
+  const lista=listaArg||await window.telemetriaBase.listar(TIPO_TELEMETRIA_PAGINA);
+  const info=document.getElementById('baseTelemetriaInfo'), resumo=document.getElementById('baseTelemetriaResumo'), disp=document.getElementById('periodoDisponivelTelemetria');
+  const ini=document.getElementById('dataInicialTelemetria'), fim=document.getElementById('dataFinalTelemetria'), status=document.getElementById('statusTelemetria');
+  if(!lista.length){
+    if(resumo) resumo.textContent='Nenhum arquivo salvo. Adicione a telemetria em 🗄️ Bases.';
+    if(disp) disp.textContent='Nenhuma telemetria disponível para análise.';
+    if(status) status.textContent='Nenhuma telemetria armazenada para Tratos.';
+    return;
+  }
+  const min=Math.min(...lista.map(x=>x.dataMinMs)), max=Math.max(...lista.map(x=>x.dataMaxMs));
+  if(resumo) resumo.textContent=`${lista.length} arquivo(s) • ${formatarBytes(lista.reduce((s,x)=>s+x.tamanho,0))} armazenados neste navegador.`;
+  if(disp) disp.innerHTML=`Período disponível: <strong>${formatarDataBR(min)} → ${formatarDataBR(max)}</strong> • ${lista.reduce((s,x)=>s+(x.registros||0),0).toLocaleString('pt-BR')} registro(s)`;
+  if(ini){ini.min=formatarDataInput(min);ini.max=formatarDataInput(max);if(!ini.value)ini.value=formatarDataInput(min);}
+  if(fim){fim.min=formatarDataInput(min);fim.max=formatarDataInput(max);if(!fim.value)fim.value=formatarDataInput(max);}
+  validarPeriodoTelemetria();
+}
+
+// Mantido apenas por compatibilidade: o upload agora acontece na página Bases.
+async function selecionarArquivoTelemetria(){ alert('A telemetria é adicionada pela página 🗄️ Bases.'); }
+async function removerBaseTelemetria(){ alert('A remoção da telemetria é feita pela página 🗄️ Bases.'); }
+
+function validarPeriodoTelemetria(){
+  const ini=document.getElementById('dataInicialTelemetria'),fim=document.getElementById('dataFinalTelemetria');
+  if(!ini||!fim||!ini.value||!fim.value){periodoTelemetriaSelecionado={inicio:null,fim:null};return false;}
+  const d1=new Date(ini.value+'T00:00:00'),d2=new Date(fim.value+'T00:00:00');
+  if(isNaN(d1)||isNaN(d2)||d1>d2){fim.setCustomValidity('A data final deve ser igual ou posterior à data inicial.');periodoTelemetriaSelecionado={inicio:null,fim:null};return false;}
+  fim.setCustomValidity('');periodoTelemetriaSelecionado={inicio:d1.getTime(),fim:d2.getTime()+86400000};return true;
+}
+
+async function prepararArquivoTelemetriaCompartilhada(){
+  if(!validarPeriodoTelemetria()) return null;
+  const arquivos=await window.telemetriaBase.arquivosParaAnalise(TIPO_TELEMETRIA_PAGINA,periodoTelemetriaSelecionado.inicio,periodoTelemetriaSelecionado.fim);
+  if(!arquivos.length){ alert('Não há arquivos de telemetria armazenados que cubram o período escolhido.'); return null; }
+  return arquivos[0];
+}
 
 const IDB_TELEMETRIA_NOME = "telemetria_stream_processamento_db";
 const IDB_TELEMETRIA_STORE = "pontos";
 const IDB_TELEMETRIA_BASE_STORE = "base";
-let telemetriaBaseSalva = null;
-let salvandoBaseTelemetria = false;
-let periodoTelemetriaSelecionado = {inicio:null,fim:null};
-
-async function selecionarArquivoTelemetria(event){
-  const file = event.target.files[0];
-  const status = document.getElementById("statusTelemetria");
-  const wrap = document.getElementById("progressoWrap");
-  const fill = document.getElementById("progressoTelemetria");
-  const texto = document.getElementById("progressoTexto");
-
-  if(!file){
-    if(telemetriaBaseSalva) atualizarUIBaseTelemetria();
-    else {
-      status.textContent = "Nenhuma base salva";
-      status.className = "badge";
-      wrap.style.display = "none";
-    }
-    return;
-  }
-
-  salvandoBaseTelemetria = true;
-  status.textContent = `Salvando ${file.name} • ${formatarBytes(file.size)}...`;
-  status.className = "badge warn";
-  wrap.style.display = "block";
-  fill.style.width = "0%";
-  texto.textContent = "Preparando a base para armazenamento permanente no navegador...";
-
-  try{
-    await salvarBaseTelemetria(file);
-    arquivoTelemetriaSelecionado = file;
-    status.textContent = `Base salva • ${file.name} • ${formatarBytes(file.size)}`;
-    status.className = "badge ok";
-    texto.textContent = "Base salva. Agora você pode escolher o período e analisar quantas vezes quiser sem subir o arquivo novamente.";
-    fill.style.width = "100%";
-  }catch(e){
-    console.error(e);
-    arquivoTelemetriaSelecionado = null;
-    status.textContent = "Não foi possível salvar a base";
-    status.className = "badge bad";
-    texto.textContent = e.message || "Erro ao salvar a base.";
-    alert("Não foi possível salvar a base de telemetria.\n\n"+(e.message||e));
-  }finally{
-    salvandoBaseTelemetria = false;
-  }
-}
-
-function formatarBytes(bytes){
-  if(!Number.isFinite(bytes) || bytes < 0) return "0 B";
-  if(bytes < 1024) return `${bytes} B`;
-  const unidades = ["KB","MB","GB","TB"];
-  let valor = bytes;
-  let i = -1;
-  do{
-    valor /= 1024;
-    i++;
-  }while(valor >= 1024 && i < unidades.length-1);
-  return `${valor.toLocaleString("pt-BR",{maximumFractionDigits:2})} ${unidades[i]}`;
-}
 
 function abrirTelemetriaDB(){
   return new Promise((resolve,reject)=>{
@@ -2138,154 +1493,6 @@ function abrirTelemetriaDB(){
     req.onsuccess = ()=>resolve(req.result);
     req.onerror = ()=>reject(req.error);
   });
-}
-
-function salvarObjetoTelemetriaBase(db,base){
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_TELEMETRIA_BASE_STORE,"readwrite");
-    tx.objectStore(IDB_TELEMETRIA_BASE_STORE).put(base);
-    tx.oncomplete=resolve;
-    tx.onerror=()=>reject(tx.error);
-    tx.onabort=()=>reject(tx.error||new Error("Transação de armazenamento abortada."));
-  });
-}
-
-function lerBaseTelemetria(){
-  return abrirTelemetriaDB().then(db=>new Promise((resolve,reject)=>{
-    const tx=db.transaction(IDB_TELEMETRIA_BASE_STORE,"readonly");
-    const req=tx.objectStore(IDB_TELEMETRIA_BASE_STORE).get("principal");
-    req.onsuccess=()=>{const v=req.result||null; db.close(); resolve(v);};
-    req.onerror=()=>{const e=req.error; db.close(); reject(e);};
-  }));
-}
-
-async function salvarBaseTelemetria(file){
-  const metadata = await inspecionarDatasTelemetria(file);
-  const db = await abrirTelemetriaDB();
-  try{
-    if(navigator.storage && navigator.storage.persist){
-      try{ await navigator.storage.persist(); }catch(e){}
-    }
-    await salvarObjetoTelemetriaBase(db,{
-      id:"principal", nome:file.name, tamanho:file.size, ultimaAtualizacao:Date.now(),
-      dataMinMs:metadata.dataMinMs, dataMaxMs:metadata.dataMaxMs,
-      datas:metadata.datas, arquivo:file
-    });
-    telemetriaBaseSalva={id:"principal",nome:file.name,tamanho:file.size,ultimaAtualizacao:Date.now(),dataMinMs:metadata.dataMinMs,dataMaxMs:metadata.dataMaxMs,datas:metadata.datas,arquivo:file};
-    atualizarUIBaseTelemetria();
-  }finally{ db.close(); }
-}
-
-function formatarDataInput(ms){
-  if(!Number.isFinite(ms)) return "";
-  const d=new Date(ms);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
-function formatarDataBR(ms){
-  if(!Number.isFinite(ms)) return "";
-  return new Date(ms).toLocaleDateString("pt-BR");
-}
-
-function atualizarUIBaseTelemetria(){
-  const info=document.getElementById("baseTelemetriaInfo");
-  const periodo=document.getElementById("periodoTelemetria");
-  const resumo=document.getElementById("baseTelemetriaResumo");
-  const status=document.getElementById("statusTelemetria");
-  const btn=document.getElementById("btnRemoverBaseTelemetria");
-  const disponivel=document.getElementById("periodoDisponivelTelemetria");
-  if(!telemetriaBaseSalva){
-    if(info) info.style.display="none";
-    if(periodo) periodo.style.display="none";
-    if(btn) btn.style.display="none";
-    return;
-  }
-  if(info) info.style.display="flex";
-  if(periodo) periodo.style.display="grid";
-  if(btn) btn.style.display="inline-block";
-  if(status){status.textContent=`Base salva • ${telemetriaBaseSalva.nome} • ${formatarBytes(telemetriaBaseSalva.tamanho)}`;status.className="badge ok";}
-  if(resumo) resumo.textContent=`Disponível de ${formatarDataBR(telemetriaBaseSalva.dataMinMs)} até ${formatarDataBR(telemetriaBaseSalva.dataMaxMs)}. A base fica salva neste navegador.`;
-  if(disponivel) disponivel.innerHTML=`Período disponível: <strong>${formatarDataBR(telemetriaBaseSalva.dataMinMs)} → ${formatarDataBR(telemetriaBaseSalva.dataMaxMs)}</strong>`;
-  const ini=document.getElementById("dataInicialTelemetria"),fim=document.getElementById("dataFinalTelemetria");
-  if(ini){ini.min=formatarDataInput(telemetriaBaseSalva.dataMinMs);ini.max=formatarDataInput(telemetriaBaseSalva.dataMaxMs);if(!ini.value)ini.value=formatarDataInput(telemetriaBaseSalva.dataMinMs);}
-  if(fim){fim.min=formatarDataInput(telemetriaBaseSalva.dataMinMs);fim.max=formatarDataInput(telemetriaBaseSalva.dataMaxMs);if(!fim.value)fim.value=formatarDataInput(telemetriaBaseSalva.dataMaxMs);}
-  validarPeriodoTelemetria();
-}
-
-function validarPeriodoTelemetria(){
-  const ini=document.getElementById("dataInicialTelemetria"),fim=document.getElementById("dataFinalTelemetria");
-  if(!ini||!fim||!ini.value||!fim.value){periodoTelemetriaSelecionado={inicio:null,fim:null};return false;}
-  const d1=new Date(ini.value+"T00:00:00");
-  const d2=new Date(fim.value+"T00:00:00");
-  if(isNaN(d1)||isNaN(d2)||d1>d2){fim.setCustomValidity("A data final deve ser igual ou posterior à data inicial.");periodoTelemetriaSelecionado={inicio:null,fim:null};return false;}
-  fim.setCustomValidity("");
-  periodoTelemetriaSelecionado={inicio:d1.getTime(),fim:d2.getTime()+86400000};
-  return true;
-}
-
-async function removerBaseTelemetria(){
-  if(!telemetriaBaseSalva) return;
-  if(!confirm(`Remover a base salva \"${telemetriaBaseSalva.nome}\" deste navegador?`)) return;
-  const db=await abrirTelemetriaDB();
-  try{await new Promise((resolve,reject)=>{const tx=db.transaction(IDB_TELEMETRIA_BASE_STORE,"readwrite");tx.objectStore(IDB_TELEMETRIA_BASE_STORE).delete("principal");tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
-  finally{db.close();}
-  telemetriaBaseSalva=null;arquivoTelemetriaSelecionado=null;
-  const input=document.getElementById("arquivoTelemetria");if(input)input.value="";
-  atualizarUIBaseTelemetria();
-  const status=document.getElementById("statusTelemetria");if(status){status.textContent="Nenhuma base salva";status.className="badge";}
-}
-
-async function carregarBaseTelemetriaSalva(){
-  try{
-    telemetriaBaseSalva=await lerBaseTelemetria();
-    if(telemetriaBaseSalva){
-      arquivoTelemetriaSelecionado=null;
-      atualizarUIBaseTelemetria();
-    }
-  }catch(e){console.warn("Base de telemetria salva não pôde ser carregada",e);}
-}
-
-async function inspecionarDatasTelemetria(file){
-  return new Promise((resolve,reject)=>{
-    const reader=file.stream().getReader();
-    const decoder=new TextDecoder("utf-8");
-    let registroAtual="",dentroDeAspas=false,aspasPendente=false,sep=null,c=null,header=false;
-    let dataMinMs=Infinity,dataMaxMs=-Infinity;
-    const datasSet=new Set();
-    let bytes=0,linhas=0,lastUI=0;
-    async function processarLinha(linha){
-      if(!header){
-        sep=detectarSeparador(linha); c=encontrarColunas(dividirLinha(linha,sep));
-        if(c.dataHora<0) throw new Error("Não foi possível identificar a coluna Data/Hora da telemetria.");
-        header=true; return;
-      }
-      if(!linha.trim()) return;
-      const row=dividirLinha(linha,sep); const d=parseData(row[c.dataHora]);
-      if(!d) return;
-      const ms=d.getTime(); dataMinMs=Math.min(dataMinMs,ms);dataMaxMs=Math.max(dataMaxMs,ms);
-      const x=new Date(ms); datasSet.add(`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`);
-      linhas++;
-    }
-    async function chunk(txt){
-      let i=0;
-      if(aspasPendente){if(txt[0]==='"'){registroAtual+='"';aspasPendente=false;i=1;}else{dentroDeAspas=false;aspasPendente=false;}}
-      for(;i<txt.length;i++){const ch=txt[i];if(ch==='"'){if(i===txt.length-1){aspasPendente=true;continue;}if(dentroDeAspas&&txt[i+1]==='"'){registroAtual+='"';i++;continue;}dentroDeAspas=!dentroDeAspas;continue;}if(ch==='\n'&&!dentroDeAspas){const l=registroAtual.endsWith('\r')?registroAtual.slice(0,-1):registroAtual;registroAtual='';await processarLinha(l);continue;}registroAtual+=ch;}
-    }
-    (async()=>{try{while(true){const {value,done}=await reader.read();if(done)break;bytes+=value.byteLength;await chunk(decoder.decode(value,{stream:true}));const now=performance.now();if(now-lastUI>350){const fill=document.getElementById("progressoTelemetria");const texto=document.getElementById("progressoTexto");if(fill)fill.style.width=`${Math.min(100,bytes/file.size*100).toFixed(1)}%`;if(texto)texto.textContent=`Catalogando datas da base: ${formatarBytes(bytes)} de ${formatarBytes(file.size)}...`;lastUI=now;await new Promise(r=>setTimeout(r,0));}}const tail=decoder.decode();if(tail)await chunk(tail);if(registroAtual.trim())await processarLinha(registroAtual);if(!header)throw new Error("Nenhum cabeçalho foi encontrado na base de telemetria.");if(!Number.isFinite(dataMinMs)||!Number.isFinite(dataMaxMs))throw new Error("Nenhuma data válida foi encontrada na coluna Data/Hora.");resolve({dataMinMs,dataMaxMs,datas:[...datasSet].sort()});}catch(e){try{await reader.cancel();}catch(_){}reject(e);}})();
-  });
-}
-
-async function limparTelemetriaDB(){
-  try{
-    const db = await abrirTelemetriaDB();
-    await new Promise((resolve,reject)=>{
-      const tx = db.transaction(IDB_TELEMETRIA_STORE,"readwrite");
-      tx.objectStore(IDB_TELEMETRIA_STORE).clear();
-      tx.oncomplete = ()=>resolve();
-      tx.onerror = ()=>reject(tx.error);
-    });
-    db.close();
-  }catch(e){}
 }
 
 function gravarLoteTelemetria(db,lote){
@@ -2359,11 +1566,11 @@ async function analisarArquivoTelemetriaGrande(file){
   }
 
  const minVel = Number(document.getElementById("minVel").value);
-  const minMinutos = Number(document.getElementById("minMinutos").value);
+   const minMinutos = Number(document.getElementById("minMinutos").value);
   const maxGapMin = Number(document.getElementById("maxGap").value);
 
   localStorage.setItem(
-    "telemetria_config_tratos",
+    "telemetria_config",
     JSON.stringify({minVel,minMinutos,maxGapMin})
   );
 
@@ -2397,7 +1604,7 @@ async function analisarArquivoTelemetriaGrande(file){
   let c = null;
 
   const nomes = {
-    equipamento:"Equipamento", dataHora:"Data/Hora", grupoOperacao:"Grupo Operacao",
+    equipamento:"Equipamento", tipoEquipamento:"Tipo de Equipamento", dataHora:"Data/Hora", grupoOperacao:"Grupo Operacao",
     operacao:"Operacao", unidade:"Unidade", operador:"Operador", grupo:"Grupo",
     latitude:"Latitude", longitude:"Longitude", velocidade:"Velocidade"
   };
@@ -2490,6 +1697,8 @@ async function analisarArquivoTelemetriaGrande(file){
     }
 
     const equipamento = String(row[c.equipamento] ?? "").trim();
+    const tipoEquipamento = String(row[c.tipoEquipamento] ?? "").trim();
+    if(normalizarTexto(tipoEquipamento) !== "cit tratos") return;
     const grupo = String(row[c.grupo] ?? "").trim();
     const grupoOperacao = String(row[c.grupoOperacao] ?? "").trim();
     const operacao = String(row[c.operacao] ?? "").trim();
@@ -3462,23 +2671,23 @@ renderizarFiltrosOcorrencias();
 
 async function analisar(){
   const btnAnalise=document.getElementById("btnAnalisar");
-  if(btnAnalise){btnAnalise.disabled=true;btnAnalise.dataset.original=btnAnalise.textContent;btnAnalise.textContent="⏳ Analisando...";}
+  if(btnAnalise){
+    btnAnalise.disabled=true;
+    btnAnalise.dataset.original=btnAnalise.textContent;
+    btnAnalise.textContent="⏳ Analisando...";
+  }
+
   try{
-  if(salvandoBaseTelemetria){
-    alert("⏳ A base ainda está sendo salva. Aguarde terminar e depois faça a análise.");
-    return;
-  }
 
-  if(!arquivoTelemetriaSelecionado && telemetriaBaseSalva?.arquivo){
-    arquivoTelemetriaSelecionado = telemetriaBaseSalva.arquivo;
-  }
+    arquivoTelemetriaSelecionado = await prepararArquivoTelemetriaCompartilhada();
 
-  if(arquivoTelemetriaSelecionado){
-    if(!validarPeriodoTelemetria()){
-      alert("⚠️ Escolha um período válido dentro das datas disponíveis da base.");
-      return;
-    }
-    if(processamentoTelemetriaAtivo) return;
+    if(arquivoTelemetriaSelecionado){
+      if(!validarPeriodoTelemetria()){
+        alert("⚠️ Escolha um período válido dentro das datas disponíveis da base.");
+        return;
+      }
+
+      if(processamentoTelemetriaAtivo) return;
 
     processamentoTelemetriaAtivo = true;
 
@@ -3552,7 +2761,7 @@ function analisarTexto(){
     return;
   }
 
-  localStorage.setItem("telemetria_config_tratos",JSON.stringify({minVel,minMinutos,maxGapMin}));
+  localStorage.setItem("telemetria_config",JSON.stringify({minVel,minMinutos,maxGapMin}));
 
   const linhas=texto.split(/\r?\n/).filter(l=>l.trim()!=="");
   if(linhas.length<2){
@@ -3576,7 +2785,7 @@ function analisarTexto(){
   }
   document.getElementById("colunas").innerHTML=html;
 
-  const obrigatorias=["equipamento","dataHora","grupoOperacao","operacao","latitude","longitude","velocidade"];
+  const obrigatorias=["equipamento","tipoEquipamento","dataHora","grupoOperacao","operacao","latitude","longitude","velocidade"];
   const faltantes=obrigatorias.filter(k=>c[k]<0);
   if(faltantes.length){
     status.textContent="Não foi possível identificar: "+faltantes.map(k=>nomes[k]).join(", ");
@@ -3594,6 +2803,9 @@ function analisarTexto(){
     const velocidade=numero(row[c.velocidade]);
     const lat=converterCoordenada(row[c.latitude]);
     const lon=converterCoordenada(row[c.longitude]);
+    const equipamento=String(row[c.equipamento]??"").trim();
+    const tipoEquipamento=String(row[c.tipoEquipamento]??"").trim();
+    if(normalizarTexto(tipoEquipamento) !== "cit tratos") continue;
 
     totalPontosLidos++;
     const blocoInfo = blocos.length ? encontrarBloco(lon,lat) : undefined;
@@ -3607,7 +2819,7 @@ function analisarTexto(){
     }
 
     dados.push({
-      equipamento:String(row[c.equipamento]??"").trim(),
+      equipamento,
       grupo:String(row[c.grupo]??"").trim(),
       grupoOperacao:String(row[c.grupoOperacao]??"").trim(),
       operacao:String(row[c.operacao]??"").trim(),
@@ -4204,16 +3416,8 @@ function limparTudo(){
   }
 
   processamentoTelemetriaAtivo=false;
-  arquivoTelemetriaSelecionado=telemetriaBaseSalva?.arquivo||null;
-
-  const input=document.getElementById("arquivoTelemetria");
-  if(input) input.value="";
-
-  if(telemetriaBaseSalva) atualizarUIBaseTelemetria();
-  else {
-    const statusArquivo=document.getElementById("statusTelemetria");
-    if(statusArquivo){statusArquivo.textContent="Nenhuma base salva";statusArquivo.className="badge";}
-  }
+  arquivoTelemetriaSelecionado=null;
+  atualizarUIBaseTelemetria();
 
   const wrap=document.getElementById("progressoWrap");
   const fill=document.getElementById("progressoTelemetria");
@@ -4241,7 +3445,7 @@ function limparTudo(){
 window.addEventListener("load",async()=>{
   await carregarBaseTelemetriaSalva();
   inicializarFiltrosOperacao();
-  const cfg=localStorage.getItem("telemetria_config_tratos");
+  const cfg=localStorage.getItem("telemetria_config");
   if(cfg){
     try{
       const c=JSON.parse(cfg);
@@ -4251,43 +3455,81 @@ window.addEventListener("load",async()=>{
     }catch(e){}
   }
 
-  atualizarStatusBlocos("Carregando blocos salvos...", "warn");
-  try{
-    const blocosSalvos=await carregarBlocosDB();
-    if(blocosSalvos && blocosSalvos.length) blocos=blocosSalvos;
-  }catch(e){}
-  atualizarStatusBlocos();
-
-  atualizarStatusProdutividade("Carregando produtividade salva...", "warn");
-  try{
-    const produtividadeSalva=await carregarProdutividadeDB();
-    if(produtividadeSalva && produtividadeSalva.length){
-      produtividade=produtividadeSalva.map(obj=>({
-        ...obj,
-        sk_estimativas: obterCampo(obj,["sk_estimativas","sk_estimativa"]),
-        ds_ano_safra: obterCampo(obj,["ds_ano_safra","ano_safra","anosafra","safra"]),
-        ds_gleba: obterCampo(obj,["ds_gleba","gleba"]),
-        ds_bloco: obterCampo(obj,["ds_bloco","bloco"]),
-        ds_talhao: obterCampo(obj,["ds_talhao","talhao"]),
-        vl_area: obterCampo(obj,["vl_area","area","area_ha","areaha","area(ha)"]),
-        vl_espacamento_talhao: obterCampo(obj,["vl_espacamento_talhao","espacamento_talhao","espacamento"]),
-        vl_produtividade: obterCampo(obj,["vl_produtividade","produtividade"]),
-        vl_producao_estimada: obterCampo(obj,["vl_producao_estimada","producao_estimada","producao"])
-      }));
-    }
-  }catch(e){}
-  atualizarStatusProdutividade();
-
-  atualizarStatusChuva("Carregando chuva salva...", "warn");
-  try{
-    const chuvaSalva=await carregarChuvaDB();
-    if(chuvaSalva && chuvaSalva.length) chuva=chuvaSalva;
-  }catch(e){}
-  atualizarStatusChuva();
+  await inicializarBasesCompartilhadas();
 });
 atualizarFiltroBlocoUI();
 
 </script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="../assets/menu.js"></script>
+
+<script>
+(function(){
+  const ICONS={
+    '📡':'radio-tower','📅':'calendar-days','🎯':'target','🔎':'scan-search','🔍':'search',
+    '🗑️':'trash-2','🗑':'trash-2','⬇️':'download','⬇':'download','📄':'file-text','🗺️':'map',
+    '🗺':'map','✖':'x','⌖':'crosshair','🎛️':'sliders-horizontal','🎛':'sliders-horizontal',
+    '📊':'bar-chart-3','🥧':'pie-chart','👷':'hard-hat','📍':'map-pin','🏭':'factory',
+    '🌧':'cloud-rain','🧪':'flask-conical','🗄️':'database','🗄':'database','🟢':'circle',
+    '↺':'rotate-ccw','⌕':'search','📌':'pin','⚙️':'settings','⚙':'settings','✓':'check',
+    '⚠️':'triangle-alert','⚠':'triangle-alert','ℹ️':'info','ℹ':'info'
+  };
+  const ordered=Object.keys(ICONS).sort((a,b)=>b.length-a.length);
+  const re=new RegExp(ordered.map(s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'gu');
+
+  function convert(root){
+    if(!root || !window.lucide) return false;
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+      acceptNode(node){
+        const p=node.parentElement;
+        if(!p || p.closest('script,style,noscript,textarea,input,select,option,svg')) return NodeFilter.FILTER_REJECT;
+        re.lastIndex=0;
+        return re.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    const nodes=[]; let n;
+    while((n=walker.nextNode())) nodes.push(n);
+    let mudou=false;
+    for(const node of nodes){
+      const value=node.nodeValue;
+      re.lastIndex=0;
+      const frag=document.createDocumentFragment();
+      let last=0,m;
+      while((m=re.exec(value))){
+        if(m.index>last) frag.appendChild(document.createTextNode(value.slice(last,m.index)));
+        const i=document.createElement('i');
+        i.setAttribute('data-lucide',ICONS[m[0]]);
+        i.className='agro-icon';
+        i.setAttribute('aria-hidden','true');
+        frag.appendChild(i);
+        last=m.index+m[0].length;
+      }
+      if(last<value.length) frag.appendChild(document.createTextNode(value.slice(last)));
+      node.parentNode.replaceChild(frag,node);
+      mudou=true;
+    }
+    if(mudou && typeof window.lucide.createIcons==='function'){
+      window.lucide.createIcons({attrs:{stroke:'currentColor','stroke-width':2.15}});
+    }
+    return mudou;
+  }
+
+  function iniciar(){
+    convert(document.body);
+    const observer=new MutationObserver(mutations=>{
+      for(const m of mutations){
+        for(const node of m.addedNodes){
+          if(node.nodeType===Node.ELEMENT_NODE) convert(node);
+          else if(node.nodeType===Node.TEXT_NODE && node.parentElement) convert(node.parentElement);
+        }
+      }
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',iniciar,{once:true});
+  else iniciar();
+})();
+</script>
+
 </body>
 </html>

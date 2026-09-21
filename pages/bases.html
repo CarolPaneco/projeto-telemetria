@@ -1,1 +1,139 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bases — Em desenvolvimento</title><link rel="stylesheet" href="../assets/menu.css"></head><body><div id="appSidebarMount"></div><div class="menu-overlay" id="menuOverlay" onclick="fecharMenuLateral()"></div><main class="container app-container"><section class="card" style="margin-top:20px"><h1>🗄️ Bases</h1><p class="subtitle">Área preparada para centralizar as bases compartilhadas de blocos, produtividade de cana e chuva.</p></section><script src="../assets/menu.js"></script></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bases | Telemetria Agrícola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/menu.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root{
+      --background:#f7f8f5;--foreground:#26312b;--primary:#2f6b50;--primary-dark:#214d3a;
+      --primary-soft:#e8f1eb;--success:#3f7d5d;--warning:#a9791c;--border:#dde5df;
+      --muted:#68736c;--card:#fff;--sidebar:#17372b;--shadow:0 10px 30px rgba(23,55,43,.07);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Manrope,Inter,Arial,sans-serif;background:
+      radial-gradient(850px 360px at 10% -8%,rgba(63,125,93,.10),transparent 65%),
+      linear-gradient(180deg,#fafbf9 0%,#f4f6f3 100%);color:var(--foreground)}
+    .main{max-width:1400px;margin:0 auto;padding:34px 32px 64px}
+    .hero{margin-bottom:26px}
+    .hero-kicker{display:flex;align-items:center;gap:8px;margin-bottom:7px;color:var(--primary);
+      font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+    .hero-kicker svg{width:15px;height:15px;stroke-width:2.2}
+    .hero h1{margin:0 0 8px;font-family:"DM Sans",Manrope,Arial,sans-serif;font-size:32px;
+      line-height:1.12;letter-spacing:-.035em;font-weight:700;color:#20382d}
+    .hero p{max-width:900px;margin:0;color:var(--muted);line-height:1.65;font-size:14px}
+    .base-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:18px}
+    .card{background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .base-card{display:flex;flex-direction:column;min-height:350px;padding:22px;
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+    .base-card:hover{transform:translateY(-2px);border-color:#cbd9d0;box-shadow:0 14px 34px rgba(23,55,43,.10)}
+    .base-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:11px;
+      background:var(--primary-soft);color:var(--primary);margin-bottom:16px}
+    .base-icon svg{width:21px;height:21px;stroke-width:2}
+    .base-card h2,.telemetria-card h2{margin:0 0 8px;font-family:"DM Sans",Manrope,Arial,sans-serif;
+      font-size:18px;line-height:1.25;letter-spacing:-.02em;color:#234334}
+    .base-card p{margin:0;min-height:86px;color:var(--muted);font-size:13px;line-height:1.65}
+    .upload{margin-top:auto}
+    .file-label,.telemetria-add{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--primary);
+      color:#fff;min-height:42px;padding:10px 14px;border:0;border-radius:10px;font-size:13px;font-weight:800;
+      cursor:pointer;transition:background .16s ease,transform .16s ease}
+    .file-label:hover,.telemetria-add:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .file-label svg,.telemetria-add svg{width:16px;height:16px}
+    button.remove,.remove{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;
+      min-height:40px;margin-top:9px;padding:9px 13px;background:#f6f8f6;color:#4d5952;border:1px solid var(--border);
+      border-radius:10px;font:700 12px Manrope,Arial,sans-serif;cursor:pointer;transition:.16s ease}
+    .remove:hover{background:var(--primary-soft);border-color:#c8d9ce;color:var(--primary-dark)}
+    .badge{display:inline-flex;align-items:center;gap:6px;margin-top:11px;min-height:28px;padding:5px 9px;
+      border-radius:999px;background:#f3f5f3;border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:800}
+    .badge.ok{background:#e8f3eb;border-color:#cfe2d5;color:#2f6849}
+    .badge.warn{background:#fbf0d9;border-color:#ecd8a9;color:#7a5a18}
+    .telemetria-base{padding:22px;margin-bottom:18px}
+    .telemetria-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}
+    .telemetria-toolbar h2{display:flex;align-items:center;gap:9px;margin:0 0 5px;font-family:"DM Sans",Manrope,Arial,sans-serif;
+      font-size:20px;color:#234334;letter-spacing:-.025em}
+    .telemetria-toolbar h2 svg{width:19px;height:19px;color:var(--primary)}
+    .telemetria-toolbar p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+    .telemetria-toolbar .remove{width:auto;margin:0;white-space:nowrap}
+    .telemetria-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .telemetria-card{padding:20px;background:#fbfcfb;border:1px solid var(--border);border-radius:12px}
+    .telemetria-card h2{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .telemetria-card h2 svg{width:18px;height:18px;color:var(--primary)}
+    .telemetria-meta{min-height:43px;margin-bottom:14px;color:var(--muted);font-size:12px;line-height:1.6}
+    .telemetria-list{margin-top:15px;border-top:1px solid #e7ece8}
+    .telemetria-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;
+      padding:12px 0;border-bottom:1px solid #e7ece8}
+    .telemetria-item strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#344139;font-size:12px}
+    .telemetria-item small{display:block;margin-top:4px;color:var(--muted);font-size:11px}
+    .telemetria-delete{display:grid;place-items:center;width:34px;height:34px;padding:0;background:#f6f8f6;
+      border:1px solid var(--border);border-radius:9px;color:#68736c;cursor:pointer}
+    .telemetria-delete:hover{background:#fbeceb;color:#9a4740;border-color:#e7c7c4}
+    .telemetria-delete svg{width:15px;height:15px}
+    .telemetria-empty{padding:18px 0 4px;color:var(--muted);font-size:12px}
+    .info{padding:20px 22px;background:linear-gradient(135deg,#1d4636,#17372b);color:#fff;
+      border-radius:var(--radius);box-shadow:0 12px 30px rgba(23,55,43,.12)}
+    .info h2{display:flex;align-items:center;gap:9px;margin:0 0 8px;font-family:"DM Sans",Manrope,Arial,sans-serif;
+      font-size:18px;letter-spacing:-.02em}
+    .info h2 svg{width:18px;height:18px}
+    .info p{margin:0;color:rgba(255,255,255,.76);line-height:1.65;font-size:12px}
+    .info code{font-family:"IBM Plex Mono",monospace;color:#fff}
+    @media(max-width:1050px){.base-grid{grid-template-columns:1fr}.base-card{min-height:0}.base-card p{min-height:0;margin-bottom:20px}}
+    @media(max-width:900px){.telemetria-grid{grid-template-columns:1fr}}
+    @media(max-width:700px){.main{padding:24px 16px 46px}.hero h1{font-size:27px}.telemetria-toolbar{align-items:flex-start;flex-direction:column}
+      .telemetria-toolbar .remove{width:100%}.telemetria-item{grid-template-columns:minmax(0,1fr) auto}.telemetria-item .badge{grid-column:1/-1;grid-row:2;margin:0}}
+  </style>
+</head>
+<body>
+<div id="appSidebarMount"></div><div class="menu-overlay" id="menuOverlay" onclick="fecharMenuLateral()"></div>
+<main class="main">
+  <section class="hero"><div class="hero-kicker"><i data-lucide="database"></i> AgroVision / Dados compartilhados</div><h1>Bases compartilhadas</h1><p>As bases abaixo são carregadas uma vez e ficam disponíveis para <strong>Colhedora, Tratos e Plantadora</strong>. Não é necessário reenviar a mesma base em cada módulo.</p></section>
+  <section class="base-grid">
+    <article class="card base-card"><div class="base-icon"><i data-lucide="map-pin"></i></div><h2>Blocos</h2><p>Base geográfica dos blocos. É usada para localizar a trajetória, validar se os pontos estão dentro do bloco e relacionar gleba, bloco, talhão e unidade.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar base de blocos<input id="arquivoBlocos" type="file" accept=".csv,.json,.txt" hidden onchange="carregarBaseBlocos()"></label><button class="remove" onclick="removerBaseBlocos()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusBlocos" class="badge">Carregando...</span></div></article>
+    <article class="card base-card"><div class="base-icon"><i data-lucide="sprout"></i></div><h2>Produtividade de cana</h2><p>Base de estimativas usada para relacionar SAFRA + GLEBA + BLOCO + TALHÃO e calcular as toneladas estimadas das ocorrências.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar produtividade<input id="arquivoProdutividade" type="file" accept=".csv,.json,.txt" hidden onchange="carregarBaseProdutividade()"></label><button class="remove" onclick="removerBaseProdutividade()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusProdutividade" class="badge">Carregando...</span></div></article>
+    <article class="card base-card"><div class="base-icon"><i data-lucide="cloud-rain"></i></div><h2>Chuva</h2><p>Base diária de chuva vinculada por data + unidade + bloco. Pode ser usada por qualquer tipo de equipamento.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar base de chuva<input id="arquivoChuva" type="file" accept=".csv,.txt" hidden onchange="carregarBaseChuva()"></label><button class="remove" onclick="removerBaseChuva()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusChuva" class="badge">Carregando...</span></div></article>
+  </section>
+  <section class="card telemetria-base">
+    <div class="telemetria-toolbar">
+      <div><h2 style="font:600 24px Fraunces,Georgia,serif;color:var(--verde-900);margin:0 0 5px"><i data-lucide="radio-tower"></i> Base incremental de telemetria</h2><p style="margin:0;color:var(--suave);font-size:13px;line-height:1.55">Adicione os arquivos recebidos ao longo dos dias. Os arquivos anteriores permanecem armazenados e podem ser usados juntos nas análises.</p></div>
+      <button class="remove" style="width:auto;margin:0" onclick="atualizarTelemetriaUI()"><i data-lucide="refresh-cw"></i> Atualizar</button>
+    </div>
+    <div class="telemetria-grid">
+      <article class="telemetria-card"><h2><i data-lucide="tractor"></i> Colhedora</h2><div id="resumoTelemetriaColhedora" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaColhedora" type="file" accept=".csv,.txt" hidden onchange="adicionarTelemetria('colhedora',this)"></label><div id="listaTelemetriaColhedora" class="telemetria-list"></div></article>
+      <article class="telemetria-card"><h2><i data-lucide="sprout"></i> Tratos</h2><div id="resumoTelemetriaTratos" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaTratos" type="file" accept=".csv,.txt" hidden onchange="adicionarTelemetria('tratos',this)"></label><div id="listaTelemetriaTratos" class="telemetria-list"></div></article>
+      <article class="telemetria-card"><h2><i data-lucide="wheat"></i> Plantadora</h2><div id="resumoTelemetriaPlantadora" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaPlantadora" type="file" accept=".csv,.txt" hidden onchange="adicionarTelemetria('plantadora',this)"></label><div id="listaTelemetriaPlantadora" class="telemetria-list"></div></article>
+    </div>
+  </section>
+
+  <section class="info"><h2><i data-lucide="hard-drive"></i> Como o armazenamento funciona</h2><p id="statusGeral">Verificando as bases salvas...</p><p style="margin-top:8px">Os arquivos processados ficam no <strong>IndexedDB do navegador</strong>. O HTML/JavaScript é apenas o sistema; os dados ficam armazenados localmente e continuam disponíveis depois de fechar e reabrir o navegador, dentro do mesmo navegador/origem.</p></section>
+</main>
+<script src="../assets/menu.js"></script>
+<script src="../assets/telemetria-base.js"></script>
+<script src="../assets/bases.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded",()=>{if(window.lucide)window.lucide.createIcons();});
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+async function atualizarTelemetriaUI(){
+  for(const tipo of ['colhedora','tratos','plantadora']){
+    const lista=await telemetriaBase.listar(tipo);
+    const cap=tipo.charAt(0).toUpperCase()+tipo.slice(1);
+    const resumo=document.getElementById('resumoTelemetria'+cap), box=document.getElementById('listaTelemetria'+cap);
+    if(!lista.length){resumo.textContent='Nenhum arquivo armazenado neste navegador.';box.innerHTML='<div class="telemetria-empty">Ainda não há arquivos. Adicione o primeiro arquivo acima.</div>';continue;}
+    const bytes=lista.reduce((s,x)=>s+x.tamanho,0),reg=lista.reduce((s,x)=>s+(x.registros||0),0),min=Math.min(...lista.map(x=>x.dataMinMs)),max=Math.max(...lista.map(x=>x.dataMaxMs));
+    resumo.innerHTML=`<strong>${lista.length}</strong> arquivo(s) · <strong>${telemetriaBase.fmtBytes(bytes)}</strong> · <strong>${reg.toLocaleString('pt-BR')}</strong> registros<br>Período: ${telemetriaBase.fmtDate(min)} → ${telemetriaBase.fmtDate(max)}`;
+    box.innerHTML=lista.slice().reverse().map(x=>`<div class="telemetria-item"><div><strong>${esc(x.nome)}</strong><small>${telemetriaBase.fmtDate(x.dataMinMs)} · ${telemetriaBase.fmtBytes(x.tamanho)} · ${(x.registros||0).toLocaleString('pt-BR')} registros</small></div><span class="badge ok" style="margin:0"><i data-lucide="check"></i> Salvo</span><button class="telemetria-delete" title="Remover arquivo" aria-label="Remover arquivo" onclick="removerTelemetria(${JSON.stringify(x.id)},'${tipo}')"><i data-lucide="trash-2"></i></button></div>`).join('');
+  }
+  if(window.lucide) window.lucide.createIcons();
+}
+async function adicionarTelemetria(tipo,input){const file=input.files&&input.files[0];if(!file)return;try{await telemetriaBase.garantirPersistencia();await telemetriaBase.adicionar(tipo,file);alert(`Telemetria de ${telemetriaBase.TIPOS[tipo]} adicionada com sucesso.`);await atualizarTelemetriaUI();}catch(e){alert(`Não foi possível adicionar a telemetria.\n\n${e.message||e}`);}finally{input.value='';}}
+async function removerTelemetria(id,tipo){if(!confirm('Remover este arquivo da base de telemetria?'))return;try{await telemetriaBase.remover(id);await atualizarTelemetriaUI();}catch(e){alert(e.message||e);}}
+window.addEventListener('load',atualizarTelemetriaUI);
+</script>
+</body>
+</html>
