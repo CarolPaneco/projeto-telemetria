@@ -98,9 +98,10 @@
 
 
         <!-- PLANTADORA -->
-        <div
-          class="menu-disabled"
-          title="Plantadora — Em desenvolvimento"
+                <a
+          class="menu-link ${isPlantadora ? 'active' : ''}"
+          href="plantadora.html"
+          title="Plantadora"
         >
           <span class="menu-icon">
             <i data-lucide="wheat"></i>
@@ -108,13 +109,9 @@
 
           <span class="menu-link-text">
             Plantadora
-            <small>Em desenvolvimento</small>
+            <small>Análise de plantio</small>
           </span>
-
-          <span class="menu-tag">
-            Em breve
-          </span>
-        </div>
+        </a>
 
 
         <!-- DADOS -->

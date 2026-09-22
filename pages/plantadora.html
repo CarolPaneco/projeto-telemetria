@@ -726,6 +726,247 @@ h1 .agro-icon,h2 .agro-icon,h3 .agro-icon{
     max-width:none!important;
   }
 }
+
+/* =====================================================================
+   AGROVISION — VISUAL SYSTEM
+   Aplicado somente à apresentação. A lógica de análise permanece intacta.
+   ===================================================================== */
+:root{
+  --av-bg: oklch(0.982 0.006 105);
+  --av-fg: oklch(0.245 0.025 150);
+  --av-card: oklch(1 0 0);
+  --av-primary: oklch(0.36 0.092 151);
+  --av-primary-dark: oklch(0.24 0.055 151);
+  --av-primary-soft: oklch(0.94 0.04 145);
+  --av-secondary: oklch(0.93 0.025 139);
+  --av-muted: oklch(0.958 0.008 110);
+  --av-muted-fg: oklch(0.52 0.025 145);
+  --av-border: oklch(0.90 0.012 120);
+  --av-warning: oklch(0.60 0.12 75);
+  --av-info: oklch(0.52 0.09 240);
+  --av-radius: .5rem;
+  --av-shadow: 0 1px 2px color-mix(in oklab,var(--av-fg) 4%,transparent);
+}
+
+html,body{background:var(--av-bg)!important;color:var(--av-fg)!important}
+body{
+  font-family:"Manrope",sans-serif!important;
+  letter-spacing:0!important;
+  background:
+    radial-gradient(900px 360px at 8% -8%,rgba(56,130,91,.07),transparent 65%),
+    linear-gradient(180deg,#fbfcf9 0%,var(--av-bg) 100%)!important;
+}
+
+/* Conteúdo principal */
+.app-container{
+  max-width:none!important;
+  padding:30px 34px 64px!important;
+}
+.app-container > .card:first-child{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:6px 0 22px!important;
+  margin-bottom:0!important;
+  overflow:visible!important;
+}
+.app-container > .card:first-child::before{display:none!important}
+
+.agro-page-eyebrow{
+  color:var(--av-primary)!important;
+  font-size:11px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  letter-spacing:.11em!important;
+  text-transform:uppercase!important;
+  margin:0 0 10px!important;
+}
+.app-container > .card:first-child h1{
+  font-family:"DM Sans",sans-serif!important;
+  font-size:34px!important;
+  line-height:1.1!important;
+  letter-spacing:-.035em!important;
+  font-weight:700!important;
+  color:var(--av-fg)!important;
+  margin:0 0 9px!important;
+}
+.app-container > .card:first-child .subtitle{
+  max-width:850px!important;
+  color:var(--av-muted-fg)!important;
+  font-size:13.5px!important;
+  line-height:1.65!important;
+}
+
+/* Cards */
+.card{
+  background:var(--av-card)!important;
+  border:1px solid var(--av-border)!important;
+  border-radius:14px!important;
+  box-shadow:var(--av-shadow)!important;
+}
+.card h2,.card h3,
+.collapsible-heading h2,
+.insight-header h2,
+.quality-header h2,
+.map-header h2,
+.filtro-operacoes-header h3,
+.filtro-insights-header h3{
+  font-family:"DM Sans",sans-serif!important;
+  letter-spacing:-.025em!important;
+  color:var(--av-fg)!important;
+}
+.card h2{font-weight:700!important}
+
+/* Telemetria */
+.base-telemetria-info{
+  background:var(--av-card)!important;
+  border:1px solid var(--av-border)!important;
+  border-radius:12px!important;
+  box-shadow:var(--av-shadow)!important;
+}
+.base-telemetria-badge{
+  background:var(--av-primary-soft)!important;
+  color:var(--av-primary)!important;
+  border:1px solid color-mix(in oklab,var(--av-primary) 18%,transparent)!important;
+}
+.periodo-telemetria{
+  background:var(--av-muted)!important;
+  border-color:var(--av-border)!important;
+  border-radius:12px!important;
+}
+.periodo-disponivel{border-left-color:var(--av-primary)!important}
+
+/* Inputs */
+input,select,textarea{
+  font-family:"Manrope",sans-serif!important;
+  border:1px solid var(--av-border)!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:var(--av-fg)!important;
+  box-shadow:none!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:3px solid color-mix(in oklab,var(--av-primary) 20%,transparent)!important;
+  outline-offset:1px!important;
+  border-color:var(--av-primary)!important;
+}
+label{font-family:"Manrope",sans-serif!important;color:var(--av-muted-fg)!important}
+
+/* Botões */
+button,.file-label{
+  font-family:"Manrope",sans-serif!important;
+  border-radius:9px!important;
+  font-weight:700!important;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease,filter .15s ease!important;
+}
+button:hover,.file-label:hover{transform:translateY(-1px)}
+.primary,.file-label{
+  background:var(--av-primary)!important;
+  color:#fff!important;
+  box-shadow:0 3px 10px color-mix(in oklab,var(--av-primary) 18%,transparent)!important;
+}
+.primary:hover,.file-label:hover{background:var(--av-primary-dark)!important;filter:none!important}
+.secondary{
+  background:#fff!important;
+  color:var(--av-fg)!important;
+  border:1px solid var(--av-border)!important;
+  box-shadow:none!important;
+}
+.secondary:hover{background:var(--av-muted)!important;border-color:color-mix(in oklab,var(--av-primary) 35%,var(--av-border))!important;color:var(--av-primary)!important}
+.success{background:var(--av-primary)!important}
+
+/* Bloco de filtros */
+.filtro-operacoes,.filtro-resultados,.mapa-geral-ocorrencias,.filtro-insights{
+  background:var(--av-muted)!important;
+  border:1px solid var(--av-border)!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+.grupo-check label,.unidade-check,.filtro-check label,.bloco-localizacao-check,
+.operacoes-grupo,.filtro-grafico-box,.filtro-insight-metrica,.insight-box{
+  border-color:var(--av-border)!important;
+  background:#fff!important;
+}
+.grupo-check input:checked + label,.filtro-check input:checked+label,
+.bloco-localizacao-check:has(input:checked){
+  background:var(--av-primary-soft)!important;
+  border-color:color-mix(in oklab,var(--av-primary) 45%,var(--av-border))!important;
+  color:var(--av-primary)!important;
+}
+.operacoes-grupo-header{background:var(--av-muted)!important;border-color:var(--av-border)!important}
+
+/* Indicadores */
+.summary{gap:10px!important}
+.metric{
+  background:#fff!important;
+  border:1px solid var(--av-border)!important;
+  border-radius:12px!important;
+  box-shadow:var(--av-shadow)!important;
+  min-height:92px!important;
+}
+.metric strong{font-family:"DM Sans",sans-serif!important;color:var(--av-fg)!important;font-weight:700!important}
+.total-telemetria-card{border-top:0!important}
+.total-metric{
+  background:linear-gradient(145deg,var(--av-primary),var(--av-primary-dark))!important;
+  border-radius:11px!important;
+}
+.total-metric strong{font-family:"DM Sans",sans-serif!important}
+
+/* Tabela */
+.table-wrap{border:1px solid var(--av-border)!important;border-radius:12px!important}
+table{font-family:"Manrope",sans-serif!important}
+th{
+  background:var(--av-primary-dark)!important;
+  font-family:"Manrope",sans-serif!important;
+  font-size:10.5px!important;
+  letter-spacing:.045em!important;
+}
+td{font-family:"Manrope",sans-serif!important;font-size:12px!important;border-color:var(--av-border)!important}
+tbody tr:nth-child(even) td{background:#fafbf9!important}
+tbody tr:hover td{background:var(--av-primary-soft)!important}
+tbody tr:hover{box-shadow:inset 3px 0 0 var(--av-primary)!important}
+
+/* Mapas */
+#mapaOcorrencia,#mapaOcorrenciasGeral{
+  border:1px solid var(--av-border)!important;
+  border-radius:12px!important;
+  background:#edf2ed!important;
+}
+.map-header,.mapa-geral-header{align-items:center!important}
+.map-legend,.mapa-geral-legenda{font-family:"Manrope",sans-serif!important}
+
+/* Insights */
+.grafico-insight,.grafico-unidades-wrap,.grafico-insight,
+.unidades-painel,.grafico-insight{background:#fff!important;border-color:var(--av-border)!important}
+.grafico-insight-titulo{font-family:"DM Sans",sans-serif!important;color:var(--av-fg)!important;font-weight:700!important}
+.insights-visuais{gap:10px!important}
+.insight-box strong,.filtro-insight-metrica strong{font-family:"DM Sans",sans-serif!important}
+
+/* Barra de status e detalhes */
+.status{
+  background:var(--av-primary-soft)!important;
+  border:1px solid color-mix(in oklab,var(--av-primary) 18%,transparent)!important;
+  color:var(--av-primary-dark)!important;
+}
+.status::before{background:var(--av-primary)!important}
+.analise-meta{background:#fff!important;border-color:var(--av-border)!important}
+
+/* Upload/progresso */
+.progress-bar{background:var(--av-muted)!important;border-color:var(--av-border)!important}
+.progress-fill{background:linear-gradient(90deg,var(--av-primary),#79a76f)!important}
+
+/* Tipografia auxiliar */
+.helptext,small,.subtitle{font-family:"Manrope",sans-serif!important}
+.badge{background:var(--av-muted)!important;border-color:var(--av-border)!important}
+
+/* Espaçamento responsivo */
+@media(max-width:1100px){
+  .app-container{padding:26px 24px 54px!important}
+}
+@media(max-width:700px){
+  .app-container{padding:20px 14px 44px!important}
+  .app-container > .card:first-child h1{font-size:29px!important}
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 />
