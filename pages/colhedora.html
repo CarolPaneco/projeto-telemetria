@@ -742,7 +742,9 @@ tbody tr:hover{box-shadow:inset 3px 0 0 var(--av-primary)!important}
 let mapaOcorrencia = null;
 let mapaOcorrenciasGeral = null;
 let camadaOcorrenciasGeral = null;
-let modoCoresMapa = "operador";
+let camadaBlocosMapaGeral = null;
+let camadaPontosTiroMapaGeral = null;
+let modoCoresMapa = "operacao";
 let ocorrenciaMapaGeralDestacada = null;
 let camadaBlocoOcorrencia = null;
 let camadaTrajetoOcorrencia = null;
@@ -750,9 +752,16 @@ let marcadoresOcorrencia = [];
 let ocorrenciaMapaAtual = null;
 </script>
 <link rel="stylesheet" href="../assets/menu.css">
+<link rel="stylesheet" href="../assets/flatpickr.min.css">
+<link rel="stylesheet" href="../assets/telemetria-ui.css">
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/flatpickr.min.js"></script>
+<script src="../assets/rangePlugin.js"></script>
+<script src="../assets/flatpickr-pt.js"></script>
+<script src="../assets/telemetria-datepicker.js"></script>
 <script src="../assets/telemetria-base.js"></script>
 <script src="../assets/bases.js"></script>
+<script src="../assets/telemetria-analise-cache.js"></script>
 </head>
 <body>
 <div id="appSidebarMount"></div>
@@ -771,19 +780,37 @@ let ocorrenciaMapaAtual = null;
     </div>
     <div class="periodo-telemetria" id="periodoTelemetria" style="display:grid">
       <div>
-        <label>📅 Data inicial</label>
-        <input id="dataInicialTelemetria" type="date" onchange="validarPeriodoTelemetria()">
+        <label for="dataInicialTelemetria">📅 Data inicial</label>
+        <div class="input-com-icone">
+          <input id="dataInicialTelemetria" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" autocomplete="off" oninput="mascaraDataBR(this)" onchange="validarPeriodoTelemetria()">
+          <button type="button" class="btn-mini-calendario" id="btnCalInicio" title="Abrir mini calendário" aria-label="Abrir calendário">📅</button>
+        </div>
       </div>
       <div>
-        <label>📅 Data final</label>
-        <input id="dataFinalTelemetria" type="date" onchange="validarPeriodoTelemetria()">
+        <label for="dataFinalTelemetria">📅 Data final</label>
+        <div class="input-com-icone">
+          <input id="dataFinalTelemetria" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" autocomplete="off" oninput="mascaraDataBR(this)" onchange="validarPeriodoTelemetria()">
+          <button type="button" class="btn-mini-calendario" id="btnCalFim" title="Abrir mini calendário" aria-label="Abrir calendário">📅</button>
+        </div>
       </div>
       <div class="periodo-disponivel" id="periodoDisponivelTelemetria"></div>
     </div>
     <div class="helptext" id="statusTelemetria" style="margin:0 0 12px">A telemetria é adicionada em 🗄️ Bases → Telemetria → Colhedora.</div>
-    <div class="progress-wrap" id="progressoWrap" style="display:none">
-      <div class="progress-bar"><div id="progressoTelemetria" class="progress-fill"></div></div>
-      <div id="progressoTexto" class="helptext">Preparando arquivo...</div>
+    <div class="progress-wrap progresso-container-pro" id="progressoWrap" style="display:none">
+      <div class="progresso-top">
+        <div class="progresso-status-badge" id="progressoBadge">
+          <span class="pulso-ativo"></span>
+          <span id="progressoBadgeTexto">Processando telemetria em tempo real</span>
+        </div>
+        <div class="progresso-cronometro" id="progressoCronometro">⏱️ 00:00</div>
+      </div>
+      <div class="progress-bar-pro">
+        <div id="progressoTelemetria" class="progress-fill-pro"></div>
+      </div>
+      <div class="progresso-info-bottom">
+        <div id="progressoEtapa" class="progresso-etapa-txt">Etapa 1/3: Lendo e qualificando dados...</div>
+        <div id="progressoTexto" class="progresso-metricas-txt">Preparando arquivo...</div>
+      </div>
     </div>
 
     <div class="controls" style="margin-top:14px">
@@ -928,9 +955,9 @@ let ocorrenciaMapaAtual = null;
         <div class="mapa-geral-controles">
           <label for="modoCoresMapa">Separar cores por</label>
           <select id="modoCoresMapa" onchange="alterarModoCoresMapa(this.value)">
-            <option value="operador">Operador</option>
+            <option value="operacao" selected>Operação</option>
             <option value="grupoOperacao">Grupo de operação</option>
-            <option value="operacao">Operação</option>
+            <option value="operador">Operador</option>
             <option value="unidade">Unidade</option>
           </select>
           <button type="button" class="secondary" onclick="ajustarMapaGeralOcorrencias()">⌖ Enquadrar tudo</button>
@@ -965,12 +992,18 @@ let ocorrenciaMapaAtual = null;
           <div id="operacoesFiltroResultados" class="filtro-checks"></div>
         </div>
         <div class="filtro-resultado-campo">
-          <label>Data inicial</label>
-          <input type="date" id="filtroDataInicio">
+          <label for="filtroDataInicio">Data inicial</label>
+          <div class="input-com-icone">
+            <input type="text" id="filtroDataInicio" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" autocomplete="off" oninput="mascaraDataBR(this)">
+            <button type="button" class="btn-mini-calendario" id="btnCalFiltroInicio" title="Abrir mini calendário" aria-label="Abrir calendário">📅</button>
+          </div>
         </div>
         <div class="filtro-resultado-campo">
-          <label>Data final</label>
-          <input type="date" id="filtroDataFim">
+          <label for="filtroDataFim">Data final</label>
+          <div class="input-com-icone">
+            <input type="text" id="filtroDataFim" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" autocomplete="off" oninput="mascaraDataBR(this)">
+            <button type="button" class="btn-mini-calendario" id="btnCalFiltroFim" title="Abrir mini calendário" aria-label="Abrir calendário">📅</button>
+          </div>
         </div>
         <div class="filtro-resultado-campo">
           <label>Metros mínimos</label>
@@ -1006,7 +1039,28 @@ let ocorrenciaMapaAtual = null;
       <div id="metricasInsightsFiltro" class="filtro-insights-metricas"></div>
       <div class="filtro-insights-graficos">
         <div class="filtro-grafico-box">
-          <div class="filtro-grafico-titulo">👷 Distribuição das ocorrências por operador</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <div class="filtro-grafico-titulo" id="tituloPizzaInsights" style="margin:0">👷 Distribuição das ocorrências por operador</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <select id="metricaPizzaInsights" title="Métrica exibida no gráfico" onchange="renderizarInsightsFiltroOcorrencias()" style="font-size:11.5px;padding:3px 6px;border-radius:6px;border:1px solid var(--ui-border,#cbd5e1);background:#fff;cursor:pointer;font-weight:600;color:var(--verde-950)">
+                <option value="ocorrencias" selected>Ocorrências</option>
+                <option value="duracao">Horas</option>
+                <option value="metros">Metros</option>
+                <option value="toneladas">Toneladas</option>
+              </select>
+              <select id="agrupamentoPizzaInsights" title="Agrupar por" onchange="renderizarInsightsFiltroOcorrencias()" style="font-size:11.5px;padding:3px 6px;border-radius:6px;border:1px solid var(--ui-border,#cbd5e1);background:#fff;cursor:pointer;font-weight:600;color:var(--verde-950)">
+                <option value="operador" selected>Por Operador</option>
+                <option value="operacao">Por Operação</option>
+                <option value="grupoOperacao">Por Grupo Operação</option>
+                <option value="equipamento">Por Equipamento</option>
+              </select>
+              <select id="limitePizzaInsights" title="Quantidade de fatias" onchange="renderizarInsightsFiltroOcorrencias()" style="font-size:11.5px;padding:3px 6px;border-radius:6px;border:1px solid var(--ui-border,#cbd5e1);background:#fff;cursor:pointer;font-weight:600;color:var(--verde-950)">
+                <option value="top5">Top 5 + Outros</option>
+                <option value="top8" selected>Top 8 + Outros</option>
+                <option value="todos">Todos</option>
+              </select>
+            </div>
+          </div>
           <div id="graficoPizzaOperadoresFiltro"></div>
         </div>
         <div class="filtro-grafico-box">
@@ -1292,6 +1346,9 @@ function dividirLinha(linha, sep){
   if(sep==="|"){
     return linha.split("|").map(x=>x.trim()).filter((x,i,a)=>!(i===0&&x==="")&&!(i===a.length-1&&x===""));
   }
+  if(linha.indexOf('"') === -1){
+    return linha.split(sep).map(x=>x.trim());
+  }
 
   let arr=[], atual="", aspas=false;
   for(let i=0;i<linha.length;i++){
@@ -1300,11 +1357,11 @@ function dividirLinha(linha, sep){
       if(aspas && linha[i+1]==='"'){atual+='"';i++;}
       else aspas=!aspas;
     }else if(c===sep && !aspas){
-      arr.push(atual); atual="";
+      arr.push(atual.trim()); atual="";
     }else atual+=c;
   }
-  arr.push(atual);
-  return arr.map(x=>x.trim());
+  arr.push(atual.trim());
+  return arr;
 }
 
 function encontrarColunas(headers){
@@ -1432,12 +1489,79 @@ let periodoTelemetriaSelecionado = {inicio:null,fim:null};
 const TIPO_TELEMETRIA_PAGINA = "colhedora";
 
 function formatarBytes(bytes){ return window.telemetriaBase.fmtBytes(bytes); }
-function formatarDataInput(ms){ return window.telemetriaBase.inputDate(ms); }
+function formatarDataInput(ms){ return window.telemetriaBase.inputDateBR(ms); }
 function formatarDataBR(ms){ return window.telemetriaBase.fmtDate(ms); }
+function parseDataBR(str){ return window.telemetriaBase.parseDateBR(str); }
+
+function mascaraDataBR(el){
+  let v = el.value.replace(/\D/g, '').slice(0, 8);
+  if(v.length > 4) v = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+  else if(v.length > 2) v = v.replace(/^(\d{2})(\d{0,2})/, '$1/$2');
+  el.value = v;
+}
+
+function dataBRParaISO(str){
+  if(!str) return '';
+  str = String(str).trim();
+  const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  return '';
+}
+
+function isoParaDataBR(str){
+  if(!str) return '';
+  str = String(str).trim();
+  const m = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if(m) return `${m[3].padStart(2,'0')}/${m[2].padStart(2,'0')}/${m[1]}`;
+  return str;
+}
+
+let fpPeriodoTelemetria = null;
+let fpFiltroResultados = null;
+
+function inicializarFlatpickrPeriodo(){
+  if(typeof window.telemetriaDatePicker === 'undefined') return;
+  if(fpPeriodoTelemetria) return;
+  fpPeriodoTelemetria = window.telemetriaDatePicker.criarRangePicker({
+    inputInicioId: 'dataInicialTelemetria',
+    inputFimId: 'dataFinalTelemetria',
+    btnInicioId: 'btnCalInicio',
+    btnFimId: 'btnCalFim',
+    onChange: function(){
+      validarPeriodoTelemetria();
+    },
+    onClose: function(){
+      validarPeriodoTelemetria();
+    }
+  });
+}
+
+function inicializarFlatpickrFiltro(){
+  if(typeof window.telemetriaDatePicker === 'undefined') return;
+  if(fpFiltroResultados) return;
+  fpFiltroResultados = window.telemetriaDatePicker.criarRangePicker({
+    inputInicioId: 'filtroDataInicio',
+    inputFimId: 'filtroDataFim',
+    btnInicioId: 'btnCalFiltroInicio',
+    btnFimId: 'btnCalFiltroFim',
+    onChange: function(){
+      const di = document.getElementById('filtroDataInicio');
+      const df = document.getElementById('filtroDataFim');
+      filtrosOcorrencias.dataInicio = di ? di.value : '';
+      filtrosOcorrencias.dataFim = df ? df.value : '';
+      aplicarFiltrosOcorrencias();
+    },
+    onClose: function(){
+      aplicarFiltrosOcorrencias();
+    }
+  });
+}
 
 async function carregarBaseTelemetriaSalva(){
   const lista=await window.telemetriaBase.listar(TIPO_TELEMETRIA_PAGINA);
   telemetriaBaseSalva=lista.length?lista[lista.length-1]:null;
+  inicializarFlatpickrPeriodo();
   atualizarUIBaseTelemetria(lista);
 }
 
@@ -1445,17 +1569,55 @@ async function atualizarUIBaseTelemetria(listaArg){
   const lista=listaArg||await window.telemetriaBase.listar(TIPO_TELEMETRIA_PAGINA);
   const info=document.getElementById('baseTelemetriaInfo'), resumo=document.getElementById('baseTelemetriaResumo'), disp=document.getElementById('periodoDisponivelTelemetria');
   const ini=document.getElementById('dataInicialTelemetria'), fim=document.getElementById('dataFinalTelemetria'), status=document.getElementById('statusTelemetria');
-  if(!lista.length){
+  inicializarFlatpickrPeriodo();
+  if(!lista || !lista.length){
     if(resumo) resumo.textContent='Nenhum arquivo salvo. Adicione a telemetria em 🗄️ Bases.';
     if(disp) disp.textContent='Nenhuma telemetria disponível para análise.';
     if(status) status.textContent='Nenhuma telemetria armazenada para Colhedora.';
     return;
   }
-  const min=Math.min(...lista.map(x=>x.dataMinMs)), max=Math.max(...lista.map(x=>x.dataMaxMs));
-  if(resumo) resumo.textContent=`${lista.length} arquivo(s) • ${formatarBytes(lista.reduce((s,x)=>s+x.tamanho,0))} armazenados neste navegador.`;
-  if(disp) disp.innerHTML=`Período disponível: <strong>${formatarDataBR(min)} → ${formatarDataBR(max)}</strong> • ${lista.reduce((s,x)=>s+(x.registros||0),0).toLocaleString('pt-BR')} registro(s)`;
-  if(ini){ini.min=formatarDataInput(min);ini.max=formatarDataInput(max);if(!ini.value)ini.value=formatarDataInput(min);}
-  if(fim){fim.min=formatarDataInput(min);fim.max=formatarDataInput(max);if(!fim.value)fim.value=formatarDataInput(max);}
+  const datasMin = [];
+  const datasMax = [];
+  for (const item of lista) {
+    const mi = (typeof item.dataMinMs === 'number' && Number.isFinite(item.dataMinMs) && item.dataMinMs > 0) ? item.dataMinMs : null;
+    const ma = (typeof item.dataMaxMs === 'number' && Number.isFinite(item.dataMaxMs) && item.dataMaxMs > 0) ? item.dataMaxMs : null;
+    if (mi && ma) {
+      datasMin.push(Math.min(mi, ma));
+      datasMax.push(Math.max(mi, ma));
+    } else if (mi) {
+      datasMin.push(mi);
+      datasMax.push(mi);
+    } else if (ma) {
+      datasMax.push(ma);
+      datasMax.push(ma);
+    }
+  }
+  const min = datasMin.length ? Math.min(...datasMin) : null;
+  const max = datasMax.length ? Math.max(...datasMax) : null;
+
+  if(resumo) resumo.textContent=`${lista.length} arquivo(s) • ${formatarBytes(lista.reduce((s,x)=>s+(x.tamanho||0),0))} armazenados neste navegador.`;
+  if(min !== null && max !== null){
+    if(disp) disp.innerHTML=`Período disponível: <strong>${formatarDataBR(min)} → ${formatarDataBR(max)}</strong> • ${lista.reduce((s,x)=>s+(x.registros||0),0).toLocaleString('pt-BR')} registro(s)`;
+    if(ini){
+      ini.placeholder='DD/MM/AAAA';
+      if(!ini.value || ini.value.includes('NaN')) ini.value=formatarDataInput(min);
+    }
+    if(fim){
+      fim.placeholder='DD/MM/AAAA';
+      if(!fim.value || fim.value.includes('NaN')) fim.value=formatarDataInput(max);
+    }
+    if(fpPeriodoTelemetria){
+      try{
+        fpPeriodoTelemetria.set('minDate', new Date(min));
+        fpPeriodoTelemetria.set('maxDate', new Date(max));
+        const d1 = parseDataBR(ini ? ini.value : '');
+        const d2 = parseDataBR(fim ? fim.value : '');
+        if(d1 && d2) fpPeriodoTelemetria.setDate([d1, d2], false);
+      }catch(e){}
+    }
+  } else {
+    if(disp) disp.textContent='Arquivos armazenados sem intervalo de data identificado.';
+  }
   validarPeriodoTelemetria();
 }
 
@@ -1466,56 +1628,95 @@ async function removerBaseTelemetria(){ alert('A remoção da telemetria é feit
 function validarPeriodoTelemetria(){
   const ini=document.getElementById('dataInicialTelemetria'),fim=document.getElementById('dataFinalTelemetria');
   if(!ini||!fim||!ini.value||!fim.value){periodoTelemetriaSelecionado={inicio:null,fim:null};return false;}
-  const d1=new Date(ini.value+'T00:00:00'),d2=new Date(fim.value+'T00:00:00');
-  if(isNaN(d1)||isNaN(d2)||d1>d2){fim.setCustomValidity('A data final deve ser igual ou posterior à data inicial.');periodoTelemetriaSelecionado={inicio:null,fim:null};return false;}
-  fim.setCustomValidity('');periodoTelemetriaSelecionado={inicio:d1.getTime(),fim:d2.getTime()+86400000};return true;
+  const d1=parseDataBR(ini.value), d2=parseDataBR(fim.value);
+  if(!d1 || !d2 || isNaN(d1.getTime()) || isNaN(d2.getTime()) || d1>d2){
+    if(fim.setCustomValidity) fim.setCustomValidity('A data final deve ser igual ou posterior à data inicial (DD/MM/AAAA).');
+    periodoTelemetriaSelecionado={inicio:null,fim:null};
+    return false;
+  }
+  if(fim.setCustomValidity) fim.setCustomValidity('');
+  periodoTelemetriaSelecionado={inicio:d1.getTime(),fim:d2.getTime()+86400000};
+  return true;
 }
 
 async function prepararArquivoTelemetriaCompartilhada(){
-  if(!validarPeriodoTelemetria()) return null;
-  const arquivos=await window.telemetriaBase.arquivosParaAnalise(TIPO_TELEMETRIA_PAGINA,periodoTelemetriaSelecionado.inicio,periodoTelemetriaSelecionado.fim);
-  if(!arquivos.length){ alert('Não há arquivos de telemetria armazenados que cubram o período escolhido.'); return null; }
-  return arquivos[0];
-}
+  const lista=await window.telemetriaBase.listar(TIPO_TELEMETRIA_PAGINA);
+  if(!lista || !lista.length){
+    alert(`⚠️ Nenhum arquivo de telemetria armazenado para COLHEDORA.\n\nPor favor, adicione os arquivos de telemetria na página 🗄️ Bases.`);
+    return null;
+  }
 
-const IDB_TELEMETRIA_NOME = "telemetria_stream_processamento_db";
-const IDB_TELEMETRIA_STORE = "pontos";
-const IDB_TELEMETRIA_BASE_STORE = "base";
-
-function abrirTelemetriaDB(){
-  return new Promise((resolve,reject)=>{
-    const req = indexedDB.open(IDB_TELEMETRIA_NOME,2);
-
-    req.onupgradeneeded = ()=>{
-      const db = req.result;
-      if(!db.objectStoreNames.contains(IDB_TELEMETRIA_STORE)){
-        const store = db.createObjectStore(IDB_TELEMETRIA_STORE,{keyPath:"id",autoIncrement:true});
-        store.createIndex("equipamento_data",["equipamentoKey","dataMs"],{unique:false});
+  let periodoValido = validarPeriodoTelemetria();
+  if(!periodoValido){
+    const datasMin = [];
+    const datasMax = [];
+    for (const item of lista) {
+      const mi = (typeof item.dataMinMs === 'number' && Number.isFinite(item.dataMinMs) && item.dataMinMs > 0) ? item.dataMinMs : null;
+      const ma = (typeof item.dataMaxMs === 'number' && Number.isFinite(item.dataMaxMs) && item.dataMaxMs > 0) ? item.dataMaxMs : null;
+      if (mi && ma) {
+        datasMin.push(Math.min(mi, ma));
+        datasMax.push(Math.max(mi, ma));
+      } else if (mi) {
+        datasMin.push(mi);
+        datasMax.push(mi);
+      } else if (ma) {
+        datasMax.push(ma);
+        datasMax.push(ma);
       }
-      if(!db.objectStoreNames.contains(IDB_TELEMETRIA_BASE_STORE)){
-        db.createObjectStore(IDB_TELEMETRIA_BASE_STORE,{keyPath:"id"});
+    }
+    if(datasMin.length && datasMax.length){
+      const min = Math.min(...datasMin);
+      const max = Math.max(...datasMax);
+      const ini = document.getElementById('dataInicialTelemetria');
+      const fim = document.getElementById('dataFinalTelemetria');
+      if(ini && (!ini.value || ini.value.includes('NaN'))) ini.value = formatarDataInput(min);
+      if(fim && (!fim.value || fim.value.includes('NaN'))) fim.value = formatarDataInput(max);
+      if(fpPeriodoTelemetria) {
+        try { fpPeriodoTelemetria.setDate([new Date(min), new Date(max)], false); } catch(e){}
       }
-    };
+      periodoValido = validarPeriodoTelemetria();
+    }
+  }
 
-    req.onsuccess = ()=>resolve(req.result);
-    req.onerror = ()=>reject(req.error);
-  });
+  if(!periodoValido || !periodoTelemetriaSelecionado.inicio || !periodoTelemetriaSelecionado.fim){
+    alert('⚠️ Por favor, selecione um período de análise válido (data inicial e data final no formato DD/MM/AAAA).');
+    return null;
+  }
+
+  const inicioMs = periodoTelemetriaSelecionado.inicio;
+  const fimMs = periodoTelemetriaSelecionado.fim;
+
+  const regs = lista.filter(r => {
+    const mi = (typeof r.dataMinMs === 'number' && Number.isFinite(r.dataMinMs) && r.dataMinMs > 0) ? r.dataMinMs : null;
+    const ma = (typeof r.dataMaxMs === 'number' && Number.isFinite(r.dataMaxMs) && r.dataMaxMs > 0) ? r.dataMaxMs : null;
+    if(mi === null && ma === null) return true;
+    const efMin = (mi && ma) ? Math.min(mi, ma) : (mi || ma);
+    const efMax = (mi && ma) ? Math.max(mi, ma) : (ma || mi);
+    return efMin <= fimMs && efMax >= inicioMs;
+  }).sort((a,b) => (a.dataMinMs || 0) - (b.dataMinMs || 0));
+
+  if(!regs.length){
+    alert('⚠️ Não há arquivos de telemetria armazenados que cubram o período escolhido (' +
+      formatarDataBR(inicioMs) + ' → ' + formatarDataBR(fimMs - 1) + ').\n\n' +
+      'Ajuste o período para as datas disponíveis da base.');
+    return null;
+  }
+
+  if(regs.length === 1){
+    return new File([regs[0].header || '', '\n', regs[0].body || ''], regs[0].nome, { type: 'text/plain' });
+  }
+  const partes = [];
+  for(let i = 0; i < regs.length; i++){
+    if(i === 0){
+      partes.push(regs[i].header || '');
+      partes.push('\n');
+    }
+    partes.push(regs[i].body || '');
+    partes.push('\n');
+  }
+  return new File(partes, `${regs.length}_arquivos_telemetria.csv`, { type: 'text/plain' });
 }
 
-function gravarLoteTelemetria(db,lote){
-  if(!lote.length) return Promise.resolve();
-
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(IDB_TELEMETRIA_STORE,"readwrite");
-    const store = tx.objectStore(IDB_TELEMETRIA_STORE);
-
-    for(const ponto of lote) store.add(ponto);
-
-    tx.oncomplete = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
-    tx.onabort = ()=>reject(tx.error || new Error("Transação abortada."));
-  });
-}
 
 function chaveOrdenacaoEquipamento(equipamento){
   const s = String(equipamento ?? "").trim();
@@ -1530,21 +1731,26 @@ function chaveOrdenacaoEquipamento(equipamento){
   return `1:${normalizarTexto(s)}`;
 }
 
-function atualizarProgressoTelemetria(bytesLidos,totalBytes,linhas){
+function atualizarProgressoTelemetria(bytesLidos,totalBytes,linhas,pontosVal,pontosQual){
   const pct = totalBytes > 0
-    ? Math.min(100,(bytesLidos/totalBytes)*100)
+    ? Math.min(65,(bytesLidos/totalBytes)*65)
     : 0;
 
   const fill = document.getElementById("progressoTelemetria");
+  const etapa = document.getElementById("progressoEtapa");
   const texto = document.getElementById("progressoTexto");
 
-  if(fill) fill.style.width = `${pct.toFixed(2)}%`;
-
+  if(fill) {
+    fill.style.width = `${pct.toFixed(1)}%`;
+    fill.classList.remove("concluido");
+  }
+  if(etapa) etapa.textContent = "Etapa 1/3: Lendo arquivo CSV e cruzando com blocos...";
   if(texto){
+    const pctBytes = totalBytes > 0 ? Math.round((bytesLidos/totalBytes)*100) : 0;
     texto.textContent =
-      `Lendo ${formatarBytes(bytesLidos)} de ${formatarBytes(totalBytes)} `+
-      `(${pct.toLocaleString("pt-BR",{maximumFractionDigits:1})}%) • `+
-      `${linhas.toLocaleString("pt-BR")} linha(s) processada(s)`;
+      `${formatarBytes(bytesLidos)} de ${formatarBytes(totalBytes)} (${pctBytes}%) • `+
+      `${linhas.toLocaleString("pt-BR")} linha(s) lida(s) • `+
+      `${(pontosQual||0).toLocaleString("pt-BR")} ponto(s) qualificado(s)`;
   }
 }
 
@@ -1553,22 +1759,26 @@ async function analisarArquivoTelemetriaGrande(file){
   const colunasEl = document.getElementById("colunas");
   const wrap = document.getElementById("progressoWrap");
   if(!obterGruposSelecionados().length){
+    processamentoTelemetriaAtivo = false;
     alert("⚠️ Selecione pelo menos um Grupo de Operação antes de continuar a análise.");
     return;
   }
   const possuiOperacaoSelecionada=[...estadoFiltroOperacoes.grupos].some(g=>(estadoFiltroOperacoes.operacoes.get(g)?.size||0)>0);
   if(!possuiOperacaoSelecionada){
+    processamentoTelemetriaAtivo = false;
     alert("⚠️ Selecione pelo menos uma Operação dentro do grupo escolhido antes de continuar a análise.");
     return;
   }
 
-   if(!estadoFiltroBloco.size){
+  if(!estadoFiltroBloco.size){
+    processamentoTelemetriaAtivo = false;
     alert("⚠️ Selecione pelo menos uma opção: Dentro do bloco ou Fora do bloco.");
     atualizarFiltroBlocoUI();
     return;
   }
-  if(!blocos.length){
-    alert("⚠️ Carregue a base de blocos antes de analisar com o filtro Dentro/Fora do bloco.");
+  if(!blocos.length && estadoFiltroBloco.has("dentro") && !estadoFiltroBloco.has("fora")){
+    processamentoTelemetriaAtivo = false;
+    alert("⚠️ Carregue a base de blocos na página 🗄️ Bases antes de analisar com o filtro apenas Dentro do bloco.");
     return;
   }
 
@@ -1595,17 +1805,38 @@ async function analisarArquivoTelemetriaGrande(file){
   wrap.style.display = "block";
   status.textContent = `Preparando ${file.name} (${formatarBytes(file.size)}) para ${formatarDataBR(periodoTelemetriaSelecionado.inicio)} → ${formatarDataBR(periodoTelemetriaSelecionado.fim-1)}...`;
 
-  const db = await abrirTelemetriaDB();
+  const timerInicio = performance.now();
+  const elCron = document.getElementById("progressoCronometro");
+  const badge = document.getElementById("progressoBadge");
+  const badgeTexto = document.getElementById("progressoBadgeTexto");
+  const fill = document.getElementById("progressoTelemetria");
+  const etapa = document.getElementById("progressoEtapa");
+  const texto = document.getElementById("progressoTexto");
 
-  // Limpa somente os pontos da análise anterior. O arquivo original nunca
-  // é copiado para textarea e nunca é carregado inteiro na memória.
-  await new Promise((resolve,reject)=>{
-    const tx = db.transaction(IDB_TELEMETRIA_STORE,"readwrite");
-    tx.objectStore(IDB_TELEMETRIA_STORE).clear();
-    tx.oncomplete = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
-    tx.onabort = ()=>reject(tx.error || new Error("Não foi possível limpar o processamento anterior."));
-  });
+  if(badge){
+    badge.className = "progresso-status-badge";
+    badge.style.background = "";
+    badge.style.borderColor = "";
+  }
+  if(badgeTexto) badgeTexto.textContent = "Processando telemetria em tempo real";
+  if(elCron) elCron.textContent = "⏱️ 00:00";
+  if(fill){
+    fill.style.width = "0%";
+    fill.classList.remove("concluido");
+  }
+  if(etapa) etapa.textContent = "Etapa 1/3: Iniciando leitura e filtros...";
+  if(texto) texto.textContent = `Preparando ${file.name}...`;
+
+  const timerInterval = setInterval(() => {
+    if(elCron){
+      const segs = Math.floor((performance.now() - timerInicio) / 1000);
+      const min = String(Math.floor(segs / 60)).padStart(2, '0');
+      const s = String(segs % 60).padStart(2, '0');
+      elCron.textContent = `⏱️ ${min}:${s}`;
+    }
+  }, 400);
+
+  const pontosQualificadosLista = [];
 
   let headerProcessado = false;
   let sep = null;
@@ -1632,19 +1863,11 @@ async function analisarArquivoTelemetriaGrande(file){
   let coordenadasValidas = 0;
   let coordenadasInvalidas = 0;
 
-  const lote = [];
-  const TAMANHO_LOTE = 5000;
   let ultimaAtualizacaoUI = 0;
 
   function qualifica(velocidade,pressao,grupoOperacao,operacao){
     return velocidade >= minVel && pressao >= minPressao &&
            registroAtendeFiltroOperacao(grupoOperacao,operacao);
-  }
-
-  async function flushLote(){
-    if(!lote.length) return;
-    const copia = lote.splice(0,lote.length);
-    await gravarLoteTelemetria(db,copia);
   }
 
   async function processarRegistro(linha){
@@ -1715,7 +1938,7 @@ async function analisarArquivoTelemetriaGrande(file){
     // Mantém exatamente a regra atual: primeiro valida o ponto contra os
     // blocos e conta os pontos fora, depois decide se ele entra na ocorrência.
     const blocoInfo = blocos.length
-      ? encontrarBloco(lon,lat)
+      ? encontrarBloco(lon,lat,equipamento)
       : undefined;
 
     if(blocos.length && !blocoInfo){
@@ -1751,7 +1974,7 @@ async function analisarArquivoTelemetriaGrande(file){
 
     pontosQualificados++;
 
-    lote.push({
+    pontosQualificadosLista.push({
       equipamento,
       equipamentoKey: chaveOrdenacaoEquipamento(equipamento),
       grupo, grupoOperacao, operacao, unidade, operador,
@@ -1765,10 +1988,6 @@ async function analisarArquivoTelemetriaGrande(file){
       talhao: blocoInfo ? blocoInfo.talhao : null,
       blocoInfo: blocoInfo || null
     });
-
-    if(lote.length >= TAMANHO_LOTE){
-      await flushLote();
-    }
   }
 
   // Leitura incremental: mantém na memória apenas o pedaço atual do arquivo
@@ -1842,8 +2061,8 @@ async function analisarArquivoTelemetriaGrande(file){
       await processarTextoChunk(txt);
 
       const agora = performance.now();
-      if(agora - ultimaAtualizacaoUI > 250){
-        atualizarProgressoTelemetria(bytesLidos,file.size,linhasProcessadas);
+      if(agora - ultimaAtualizacaoUI > 200){
+        atualizarProgressoTelemetria(bytesLidos,file.size,linhasProcessadas,pontosValidos,pontosQualificados);
         ultimaAtualizacaoUI = agora;
         await new Promise(r=>setTimeout(r,0));
       }
@@ -1865,9 +2084,10 @@ async function analisarArquivoTelemetriaGrande(file){
       aspasPendente = false;
     }
 
-    await flushLote();
-
-    atualizarProgressoTelemetria(file.size,file.size,linhasProcessadas);
+    if(fill) fill.style.width = "66%";
+    if(etapa) etapa.textContent = "Etapa 2/3: Cruzando dados com blocos e agrupando ocorrências...";
+    if(texto) texto.textContent = `${pontosQualificados.toLocaleString("pt-BR")} ponto(s) qualificado(s) pronto(s) para detecção de trajetórias...`;
+    await new Promise(r=>setTimeout(r,0));
 
     if(!headerProcessado){
       throw new Error("Nenhum cabeçalho/linha de dados foi encontrado no arquivo.");
@@ -1880,221 +2100,275 @@ async function analisarArquivoTelemetriaGrande(file){
       `Iniciando análise das ocorrências...`;
 
     await analisarPontosTelemetriaDB({
-      db,
+      pontos: pontosQualificadosLista,
       minMinutos,
       maxGapMin,
       totalPontosLidos,
       pontosValidos,
+      pontosQualificados,
       pontosForaDeBloco,
       linhasProcessadas,
       linhasDados,
       dataHoraInvalida,
       coordenadasValidas,
-      coordenadasInvalidas
+      coordenadasInvalidas,
+      timerInicio
     });
 
   }catch(e){
     try{ await reader.cancel(); }catch(err){}
+    const badge = document.getElementById("progressoBadge");
+    if(badge){
+      badge.innerHTML = `<span style="color:#dc2626;font-weight:900;">✗</span> Falha no processamento`;
+      badge.style.background = "var(--erro-bg)";
+      badge.style.borderColor = "var(--erro-borda)";
+    }
     throw e;
   }finally{
+    if(typeof timerInterval !== 'undefined') clearInterval(timerInterval);
     readerTelemetriaAtual = null;
     processamentoTelemetriaAtivo = false;
-    db.close();
   }
 }
 
-function analisarPontosTelemetriaDB(cfg){
-  return new Promise((resolve,reject)=>{
-    const {
-      db,
-      minMinutos,
-      maxGapMin,
-      totalPontosLidos,
-      pontosValidos,
-      pontosForaDeBloco,
-      linhasDados,
-      dataHoraInvalida,
-      coordenadasValidas,
-      coordenadasInvalidas
-    } = cfg;
+async function analisarPontosTelemetriaDB(cfg){
+  const {
+    pontos,
+    minMinutos,
+    maxGapMin,
+    totalPontosLidos,
+    pontosValidos,
+    pontosQualificados,
+    pontosForaDeBloco,
+    linhasDados,
+    dataHoraInvalida,
+    coordenadasValidas,
+    coordenadasInvalidas,
+    timerInicio
+  } = cfg;
 
-    const gapMs = maxGapMin*60*1000;
-    const minDurMs = minMinutos*60*1000;
-    const usaBlocos = blocos.length > 0;
+  const gapMs = maxGapMin*60*1000;
+  const minDurMs = minMinutos*60*1000;
+  const usaBlocos = blocos.length > 0;
 
-    let equipamentoAtual = null;
-    let ocorrencia = null;
+  const fill = document.getElementById("progressoTelemetria");
+  const etapa = document.getElementById("progressoEtapa");
+  const texto = document.getElementById("progressoTexto");
+  const badge = document.getElementById("progressoBadge");
 
-    function iniciarOcorrencia(r){
-      ocorrencia = {
-        equipamento:r.equipamento,
-        grupo:r.grupo,
-        grupoOperacao:r.grupoOperacao,
-        operacao:r.operacao,
-        unidade:r.unidade || "Não informado",
-        operador:r.operador || "Não informado",
-        blocoLabel:usaBlocos ? r.blocoLabel : null,
-        gleba:r.gleba || null, bloco:r.bloco || null, talhao:r.talhao || null,
-        anoSafra:r.anoSafra || null,
-        blocoInfo:r.blocoInfo || null,
-        inicioMs:r.dataMs,
-        fimMs:r.dataMs,
-        pontos:1,
-        pontosMapa:[{dataMs:r.dataMs,equipamento:r.equipamento,grupoOperacao:r.grupoOperacao,operacao:r.operacao,unidade:r.unidade,operador:r.operador,lat:r.lat,lon:r.lon,blocoLabel:r.blocoLabel,gleba:r.gleba,bloco:r.bloco,talhao:r.talhao}],
-        metros:0,
-        ultimoLatLon:{
-          lat:r.lat,
-          lon:r.lon
-        }
-      };
-    }
+  if(fill) fill.style.width = "75%";
+  if(etapa) etapa.textContent = "Etapa 2/3: Ordenando registros qualificados...";
+  if(texto) texto.textContent = `Ordenando ${pontos.length.toLocaleString("pt-BR")} pontos por máquina e tempo...`;
+  await new Promise(r=>setTimeout(r,0));
 
-    function finalizarOcorrenciaStream(){
-      if(!ocorrencia || ocorrencia.pontos < 2) return;
+  // Ordenação rápida em memória: agrupa por máquina e ordena cronologicamente
+  pontos.sort((a,b)=>{
+    if(a.equipamentoKey < b.equipamentoKey) return -1;
+    if(a.equipamentoKey > b.equipamentoKey) return 1;
+    return a.dataMs - b.dataMs;
+  });
 
-      const dur = ocorrencia.fimMs - ocorrencia.inicioMs;
-      if(dur <= minDurMs) return;
+  if(fill) fill.style.width = "85%";
+  if(etapa) etapa.textContent = "Etapa 2/3: Cruzando dados com blocos e agrupando ocorrências...";
+  if(texto) texto.textContent = `Analisando trajetórias de ${pontos.length.toLocaleString("pt-BR")} pontos...`;
+  await new Promise(r=>setTimeout(r,0));
 
-      const inicio = new Date(ocorrencia.inicioMs);
-      const blocoOcorrencia=ocorrencia.blocoInfo || blocos.find(x=>x.label===ocorrencia.blocoLabel) || {
-        anoSafra: ocorrencia.anoSafra,
-        gleba: ocorrencia.gleba,
-        bloco: ocorrencia.bloco,
-        talhao: ocorrencia.talhao,
-        areaHa: null
-      };
-      // Esta análise roda sobre os pontos já persistidos no IndexedDB.
-      // O mapa de metros totais da leitura em streaming não existe neste escopo.
-      // Se não houver uma referência explícita de metros do bloco, o cálculo
-      // deve retornar 0, conforme a regra definida para blocos sem estimativa.
-      const metrosFallback = 0;
-      const calcToneladas=calcularToneladasEstimadas(ocorrencia.metros,blocoOcorrencia,metrosFallback);
+  let equipamentoAtual = null;
+  let ocorrencia = null;
 
-      resultados.push({
-        data:inicio,
-        equipamento:ocorrencia.equipamento,
-        grupo:ocorrencia.grupo,
-        grupoOperacao:ocorrencia.grupoOperacao,
-        operacao:ocorrencia.operacao,
-        unidade:ocorrencia.unidade,
-        operador:ocorrencia.operador,
-        inicio,
-        fim:new Date(ocorrencia.fimMs),
-        duracao:dur,
-        horas:dur/3600000,
-        metros:ocorrencia.metros,
-        toneladas:calcToneladas.toneladas,
-        chuvaDia:obterChuvaDaOcorrencia({data:inicio,unidade:ocorrencia.unidade,bloco:ocorrencia.bloco,blocoLabel:ocorrencia.blocoLabel}),
-        percentualBloco:calcToneladas.percentualBloco,
-        metrosBloco:calcToneladas.metrosBloco,
-        metodoToneladas:calcToneladas.metodo,
-        producaoEstimadaBloco:calcToneladas.info ? calcToneladas.info.producaoEstimada : null,
-        areaBlocoHa:calcToneladas.info ? calcToneladas.info.areaBlocoHa : null,
-        espacamento:calcToneladas.info ? calcToneladas.info.espacamentoM : null,
-        quantidadeTalhoes:calcToneladas.info ? calcToneladas.info.quantidadeTalhoes : 0,
-        statusToneladas:calcToneladas.metodo==="sem estimativa" || calcToneladas.metodo==="sem produção estimada" ? "Sem estimativa de produção para este bloco" :
-          (calcToneladas.metodo==="sem referência de metros" ? "Sem referência de metros para este bloco" : "Calculada"),
-        pontos:ocorrencia.pontos,
-        pontosMapa:ocorrencia.pontosMapa || [],
-        // Quando existe base de blocos, todos os pontos desta ocorrência
-        // pertencem ao MESMO bloco. Não existe mais "bloco majoritário".
-        blocoLabel:usaBlocos ? ocorrencia.blocoLabel : null,
-        pctDentro:usaBlocos ? 100 : null
-      });
-    }
-
-    function adicionarPonto(r){
-      if(!ocorrencia){
-        iniciarOcorrencia(r);
-        return;
+  function iniciarOcorrencia(r){
+    ocorrencia = {
+      equipamento:r.equipamento,
+      grupo:r.grupo,
+      grupoOperacao:r.grupoOperacao,
+      operacao:r.operacao,
+      unidade:r.unidade || "Não informado",
+      operador:r.operador || "Não informado",
+      blocoLabel:usaBlocos ? r.blocoLabel : null,
+      gleba:r.gleba || null, bloco:r.bloco || null, talhao:r.talhao || null,
+      anoSafra:r.anoSafra || null,
+      blocoInfo:r.blocoInfo || null,
+      inicioMs:r.dataMs,
+      fimMs:r.dataMs,
+      pontos:1,
+      pontosMapa:[{dataMs:r.dataMs,lat:r.lat,lon:r.lon}],
+      metros:0,
+      ultimoLatLon:{
+        lat:r.lat,
+        lon:r.lon
       }
+    };
+  }
 
-      const gap = r.dataMs - ocorrencia.fimMs;
-      const mesmaClassificacao =
-        r.grupoOperacao === ocorrencia.grupoOperacao &&
-        r.operacao === ocorrencia.operacao &&
-        (r.unidade || "Não informado") === (ocorrencia.unidade || "Não informado") &&
-        (r.operador || "Não informado") === (ocorrencia.operador || "Não informado");
-      const exigeMesmoBloco = usaBlocos && filtroBlocoSelecionado("dentro") && !filtroBlocoSelecionado("fora");
-      const mesmoBloco = !exigeMesmoBloco || r.blocoLabel === ocorrencia.blocoLabel;
+  function finalizarOcorrenciaStream(){
+    if(!ocorrencia || ocorrencia.pontos < 2) return;
 
-      // Com blocos carregados, uma ocorrência só pode continuar dentro
-      // do bloco específico em que ela começou.
-      if(gap >= 0 && gap <= gapMs && mesmoBloco && mesmaClassificacao){
-        const anterior = ocorrencia.ultimoLatLon;
+    const dur = ocorrencia.fimMs - ocorrencia.inicioMs;
+    if(dur <= minDurMs) return;
 
-        if(
-          anterior &&
-          Number.isFinite(anterior.lat) &&
-          Number.isFinite(anterior.lon) &&
-          Number.isFinite(r.lat) &&
-          Number.isFinite(r.lon)
-        ){
-          ocorrencia.metros += distancia(
-            anterior.lat,
-            anterior.lon,
-            r.lat,
-            r.lon
-          );
-        }
-
-        ocorrencia.fimMs = r.dataMs;
-        ocorrencia.pontos++;
-        ocorrencia.pontosMapa.push({dataMs:r.dataMs,equipamento:r.equipamento,grupoOperacao:r.grupoOperacao,operacao:r.operacao,unidade:r.unidade,operador:r.operador,lat:r.lat,lon:r.lon,blocoLabel:r.blocoLabel});
-        ocorrencia.ultimoLatLon = {
-          lat:r.lat,
-          lon:r.lon
-        };
-      }else{
-        finalizarOcorrenciaStream();
-        iniciarOcorrencia(r);
-      }
-    }
-
-    const tx = db.transaction(IDB_TELEMETRIA_STORE,"readonly");
-    const index = tx.objectStore(IDB_TELEMETRIA_STORE).index("equipamento_data");
-    const req = index.openCursor();
-
-    req.onsuccess = e=>{
-      const cursor = e.target.result;
-
-      if(!cursor){
-        finalizarOcorrenciaStream();
-        resultados.sort((a,b)=>a.inicio-b.inicio);
-
-        renderizarResultadoTelemetria({
-          totalPontosLidos,
-          pontosValidos,
-          pontosForaDeBloco,
-          linhasDados,
-          dataHoraInvalida,
-          coordenadasValidas,
-          coordenadasInvalidas
-        });
-
-        resolve();
-        return;
-      }
-
-      const r = cursor.value;
-
-      if(equipamentoAtual === null){
-        equipamentoAtual = r.equipamento;
-        iniciarOcorrencia(r);
-      }else if(r.equipamento !== equipamentoAtual){
-        finalizarOcorrenciaStream();
-        equipamentoAtual = r.equipamento;
-        iniciarOcorrencia(r);
-      }else{
-        adicionarPonto(r);
-      }
-
-      cursor.continue();
+    const inicio = new Date(ocorrencia.inicioMs);
+    const blocoOcorrencia=ocorrencia.blocoInfo || blocos.find(x=>x.label===ocorrencia.blocoLabel) || {
+      anoSafra: ocorrencia.anoSafra,
+      gleba: ocorrencia.gleba,
+      bloco: ocorrencia.bloco,
+      talhao: ocorrencia.talhao,
+      areaHa: null
     };
 
-    req.onerror = ()=>reject(req.error);
-    tx.onerror = ()=>reject(tx.error);
+    const metrosFallback = 0;
+    const calcToneladas=calcularToneladasEstimadas(ocorrencia.metros,blocoOcorrencia,metrosFallback);
+
+    resultados.push({
+      data:inicio,
+      equipamento:ocorrencia.equipamento,
+      grupo:ocorrencia.grupo,
+      grupoOperacao:ocorrencia.grupoOperacao,
+      operacao:ocorrencia.operacao,
+      unidade:ocorrencia.unidade,
+      operador:ocorrencia.operador,
+      inicio,
+      fim:new Date(ocorrencia.fimMs),
+      duracao:dur,
+      horas:dur/3600000,
+      metros:ocorrencia.metros,
+      toneladas:calcToneladas.toneladas,
+      chuvaDia:obterChuvaDaOcorrencia({data:inicio,unidade:ocorrencia.unidade,bloco:ocorrencia.bloco,blocoLabel:ocorrencia.blocoLabel}),
+      percentualBloco:calcToneladas.percentualBloco,
+      metrosBloco:calcToneladas.metrosBloco,
+      metodoToneladas:calcToneladas.metodo,
+      producaoEstimadaBloco:calcToneladas.info ? calcToneladas.info.producaoEstimada : null,
+      areaBlocoHa:calcToneladas.info ? calcToneladas.info.areaBlocoHa : null,
+      espacamento:calcToneladas.info ? calcToneladas.info.espacamentoM : null,
+      quantidadeTalhoes:calcToneladas.info ? calcToneladas.info.quantidadeTalhoes : 0,
+      statusToneladas:calcToneladas.metodo==="sem estimativa" || calcToneladas.metodo==="sem produção estimada" ? "Sem estimativa de produção para este bloco" :
+        (calcToneladas.metodo==="sem referência de metros" ? "Sem referência de metros para este bloco" : "Calculada"),
+      pontos:ocorrencia.pontos,
+      pontosMapa:ocorrencia.pontosMapa || [],
+      blocoLabel:usaBlocos ? ocorrencia.blocoLabel : null,
+      pctDentro:usaBlocos ? 100 : null
+    });
+  }
+
+  function adicionarPonto(r){
+    if(!ocorrencia){
+      iniciarOcorrencia(r);
+      return;
+    }
+
+    const gap = r.dataMs - ocorrencia.fimMs;
+    const mesmaClassificacao =
+      r.grupoOperacao === ocorrencia.grupoOperacao &&
+      r.operacao === ocorrencia.operacao &&
+      (r.unidade || "Não informado") === (ocorrencia.unidade || "Não informado") &&
+      (r.operador || "Não informado") === (ocorrencia.operador || "Não informado");
+    const exigeMesmoBloco = usaBlocos && filtroBlocoSelecionado("dentro") && !filtroBlocoSelecionado("fora");
+    const mesmoBloco = !exigeMesmoBloco || r.blocoLabel === ocorrencia.blocoLabel;
+
+    if(gap >= 0 && gap <= gapMs && mesmoBloco && mesmaClassificacao){
+      const anterior = ocorrencia.ultimoLatLon;
+
+      if(
+        anterior &&
+        Number.isFinite(anterior.lat) &&
+        Number.isFinite(anterior.lon) &&
+        Number.isFinite(r.lat) &&
+        Number.isFinite(r.lon)
+      ){
+        ocorrencia.metros += distancia(
+          anterior.lat,
+          anterior.lon,
+          r.lat,
+          r.lon
+        );
+      }
+
+      ocorrencia.fimMs = r.dataMs;
+      ocorrencia.pontos++;
+      ocorrencia.pontosMapa.push({dataMs:r.dataMs,lat:r.lat,lon:r.lon});
+      ocorrencia.ultimoLatLon = {
+        lat:r.lat,
+        lon:r.lon
+      };
+    }else{
+      finalizarOcorrenciaStream();
+      iniciarOcorrencia(r);
+    }
+  }
+
+  const totalPontos = pontos.length;
+  let ultimoRendimento = performance.now();
+
+  for(let i = 0; i < totalPontos; i++){
+    const r = pontos[i];
+    if(equipamentoAtual === null){
+      equipamentoAtual = r.equipamento;
+      iniciarOcorrencia(r);
+    }else if(r.equipamento !== equipamentoAtual){
+      finalizarOcorrenciaStream();
+      equipamentoAtual = r.equipamento;
+      iniciarOcorrencia(r);
+    }else{
+      adicionarPonto(r);
+    }
+
+    if(i % 10000 === 0 && performance.now() - ultimoRendimento > 200){
+      ultimoRendimento = performance.now();
+      const pct = 85 + Math.round((i / totalPontos) * 10);
+      if(fill) fill.style.width = `${pct}%`;
+      if(texto) texto.textContent = `Processando trajetórias: ${i.toLocaleString("pt-BR")} de ${totalPontos.toLocaleString("pt-BR")} pontos...`;
+      await new Promise(res => setTimeout(res, 0));
+    }
+  }
+
+  finalizarOcorrenciaStream();
+  resultados.sort((a,b)=>a.inicio-b.inicio);
+
+  if(fill) fill.style.width = "95%";
+  if(etapa) etapa.textContent = "Etapa 3/3: Renderizando mapa e relatórios...";
+  if(texto) texto.textContent = `${resultados.length.toLocaleString("pt-BR")} ocorrência(s) detectada(s). Gerando visualizações...`;
+  await new Promise(r=>setTimeout(r,0));
+
+  renderizarResultadoTelemetria({
+    totalPontosLidos,
+    pontosValidos,
+    pontosForaDeBloco,
+    linhasDados,
+    dataHoraInvalida,
+    coordenadasValidas,
+    coordenadasInvalidas
   });
+
+  if(window.telemetriaAnaliseCache){
+    window.telemetriaAnaliseCache.salvar("colhedora", {
+      resultados,
+      qualidade: {
+        totalPontosLidos,
+        pontosValidos,
+        pontosForaDeBloco,
+        linhasDados,
+        dataHoraInvalida,
+        coordenadasValidas,
+        coordenadasInvalidas
+      },
+      periodo: {
+        inicio: document.getElementById('dataInicialTelemetria')?.value || '',
+        fim: document.getElementById('dataFinalTelemetria')?.value || ''
+      }
+    }).catch(err => console.warn("Erro ao salvar cache de análise:", err));
+  }
+
+  const tempoTotal = timerInicio ? ((performance.now() - timerInicio) / 1000).toFixed(1) : "—";
+  if(fill){
+    fill.style.width = "100%";
+    fill.classList.add("concluido");
+  }
+  if(badge){
+    badge.innerHTML = `<span style="color:#16a34a;font-weight:900;">✓</span> Concluído em ${tempoTotal}s`;
+    badge.style.background = "var(--ok-bg)";
+    badge.style.borderColor = "var(--ok-borda)";
+  }
+  if(etapa) etapa.textContent = `✓ Análise finalizada! ${resultados.length.toLocaleString("pt-BR")} ocorrência(s) identificada(s).`;
+  if(texto) texto.textContent = `Tempo total: ${tempoTotal}s • ${pontosValidos.toLocaleString("pt-BR")} pontos analisados`;
 }
 
 function pctQualidade(valor,total){
@@ -2334,8 +2608,10 @@ function obterResultadosVisiveis(){
     if(filtrosOcorrencias.operacoes.size&&!filtrosOcorrencias.operacoes.has(chaveFiltro(op)))return false;
     if(filtrosOcorrencias.unidades.size&&!filtrosOcorrencias.unidades.has(chaveFiltro(unidade)))return false;
     const dia=dataSomenteDia(r.data);
-    if(filtrosOcorrencias.dataInicio&&(!dia||dia<filtrosOcorrencias.dataInicio))return false;
-    if(filtrosOcorrencias.dataFim&&(!dia||dia>filtrosOcorrencias.dataFim))return false;
+    const fIni=dataBRParaISO(filtrosOcorrencias.dataInicio);
+    const fFim=dataBRParaISO(filtrosOcorrencias.dataFim);
+    if(fIni&&(!dia||dia<fIni))return false;
+    if(fFim&&(!dia||dia>fFim))return false;
     const metros=Number(r.metros)||0, toneladas=Number(r.toneladas)||0;
     if(filtrosOcorrencias.metrosMin!==""&&metros<Number(filtrosOcorrencias.metrosMin))return false;
     if(filtrosOcorrencias.metrosMax!==""&&metros>Number(filtrosOcorrencias.metrosMax))return false;
@@ -2384,17 +2660,92 @@ function mapaCorPorValor(valor, mapa){
 function limparCamadasMapaGeral(){
   if(camadaOcorrenciasGeral && mapaOcorrenciasGeral){mapaOcorrenciasGeral.removeLayer(camadaOcorrenciasGeral);}
   camadaOcorrenciasGeral=null;
+  if(camadaBlocosMapaGeral && mapaOcorrenciasGeral){mapaOcorrenciasGeral.removeLayer(camadaBlocosMapaGeral);}
+  camadaBlocosMapaGeral=null;
+  if(camadaPontosTiroMapaGeral && mapaOcorrenciasGeral){mapaOcorrenciasGeral.removeLayer(camadaPontosTiroMapaGeral);}
+  camadaPontosTiroMapaGeral=null;
 }
+
+function clarearCorHex(corHex, fator = 0.48){
+  try {
+    let c = String(corHex||"").replace("#","").trim();
+    if(c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+    const n = parseInt(c, 16);
+    if(isNaN(n)) return "#bbf7d0";
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r + (255 - r) * fator);
+    g = Math.round(g + (255 - g) * fator);
+    b = Math.round(b + (255 - b) * fator);
+    return `rgb(${r},${g},${b})`;
+  } catch(e) {
+    return "#bbf7d0";
+  }
+}
+
+function escurecerCorHex(corHex, fator = 0.52){
+  try {
+    let c = String(corHex||"").replace("#","").trim();
+    if(c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+    const n = parseInt(c, 16);
+    if(isNaN(n)) return "#14532d";
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r * (1 - fator));
+    g = Math.round(g * (1 - fator));
+    b = Math.round(b * (1 - fator));
+    return `rgb(${r},${g},${b})`;
+  } catch(e) {
+    return "#14532d";
+  }
+}
+
+const ZOOM_MINIMO_BLOCOS = 13;
+const ZOOM_MINIMO_PONTOS_TIRO = 15;
+
+function atualizarVisibilidadeCamadasDetalhadasMapaGeral(){
+  if(!mapaOcorrenciasGeral) return;
+  const zoom = mapaOcorrenciasGeral.getZoom();
+
+  // Limite do bloco: visível apenas quando aproximar (zoom >= 13)
+  if(camadaBlocosMapaGeral){
+    if(zoom >= ZOOM_MINIMO_BLOCOS){
+      if(!mapaOcorrenciasGeral.hasLayer(camadaBlocosMapaGeral)){
+        mapaOcorrenciasGeral.addLayer(camadaBlocosMapaGeral);
+      }
+    } else {
+      if(mapaOcorrenciasGeral.hasLayer(camadaBlocosMapaGeral)){
+        mapaOcorrenciasGeral.removeLayer(camadaBlocosMapaGeral);
+      }
+    }
+  }
+
+  // Bolinhas de início e fim do tiro: visíveis apenas bem perto da ocorrência (zoom >= 15)
+  if(camadaPontosTiroMapaGeral){
+    if(zoom >= ZOOM_MINIMO_PONTOS_TIRO){
+      if(!mapaOcorrenciasGeral.hasLayer(camadaPontosTiroMapaGeral)){
+        mapaOcorrenciasGeral.addLayer(camadaPontosTiroMapaGeral);
+      }
+    } else {
+      if(mapaOcorrenciasGeral.hasLayer(camadaPontosTiroMapaGeral)){
+        mapaOcorrenciasGeral.removeLayer(camadaPontosTiroMapaGeral);
+      }
+    }
+  }
+}
+
 function renderizarMapaOcorrenciasGeral(){
   const el=document.getElementById("mapaOcorrenciasGeral");
   if(!el || typeof L==="undefined")return;
   if(!mapaOcorrenciasGeral){
     mapaOcorrenciasGeral=L.map("mapaOcorrenciasGeral").setView([-20.2,-49.2],7);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles © Esri"}).addTo(mapaOcorrenciasGeral);
+    mapaOcorrenciasGeral.on("zoomend", atualizarVisibilidadeCamadasDetalhadasMapaGeral);
   }
   limparCamadasMapaGeral();
   const v=obterResultadosVisiveis();
-  const grupo=L.layerGroup().addTo(mapaOcorrenciasGeral);camadaOcorrenciasGeral=grupo;
+  const grupo=L.layerGroup().addTo(mapaOcorrenciasGeral);
+  camadaOcorrenciasGeral=grupo;
+
+  camadaPontosTiroMapaGeral = L.layerGroup();
   const mapaCores=new Map(),bounds=L.latLngBounds([]),blocosUsados=new Map();
   let linhas=0,pontos=0;
   v.forEach((r,index)=>{
@@ -2406,32 +2757,63 @@ function renderizarMapaOcorrenciasGeral(){
     const linha=L.polyline(latlngs,{color:cor,weight:4,opacity:.82,lineJoin:"round",lineCap:"round"}).addTo(grupo);
     linha.on("click",()=>focarOcorrenciaNoMapa(r));
     linha.bindTooltip(`${formatarDia(r.data)} • ${r.operacao||"—"} • ${r.equipamento||"—"}`,{sticky:true,direction:"top"});
-    const inicio=L.circleMarker(latlngs[0],{radius:5,color:"#fff",weight:2,fillColor:cor,fillOpacity:1}).addTo(grupo);
-    inicio.bindPopup(`<strong>Ocorrência ${index+1}</strong><br>Data: ${formatarDia(r.data)}<br>Unidade: ${escaparHTML(r.unidade||"Não informado")}<br>Operador: ${escaparHTML(r.operador||"Não informado")}<br>Grupo: ${escaparHTML(r.grupoOperacao||"Não informado")}<br>Operação: ${escaparHTML(r.operacao||"Não informado")}<br>Metros: ${Number(r.metros||0).toLocaleString("pt-BR",{maximumFractionDigits:2})} m`);
+
+    // Bolinha clara indicando início do tiro (visível apenas bem perto)
+    const inicioTom = clarearCorHex(cor, 0.48);
+    const inicio=L.circleMarker(latlngs[0],{radius:5.5,color:cor,weight:2,fillColor:inicioTom,fillOpacity:1}).addTo(camadaPontosTiroMapaGeral);
+    inicio.bindTooltip(`⚪ Início do tiro (${formatarDia(r.inicio)} ${r.inicio ? r.inicio.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : ''})`,{direction:"top"});
+    inicio.bindPopup(`<strong>Início do tiro - Ocorrência ${index+1}</strong><br>Data: ${formatarDia(r.data)}<br>Operação: ${escaparHTML(r.operacao||"—")}<br>Equipamento: ${escaparHTML(r.equipamento||"—")}<br>Operador: ${escaparHTML(r.operador||"—")}<br>Grupo: ${escaparHTML(r.grupoOperacao||"—")}<br>Metros: ${Number(r.metros||0).toLocaleString("pt-BR",{maximumFractionDigits:2})} m`);
     inicio.on("click",()=>destacarOcorrenciaMapaGeral(r));
+
+    // Bolinha escura indicando final do tiro (visível apenas bem perto)
+    if(latlngs.length > 1){
+      const fimTom = escurecerCorHex(cor, 0.52);
+      const fim=L.circleMarker(latlngs[latlngs.length - 1],{radius:5.5,color:"#ffffff",weight:2,fillColor:fimTom,fillOpacity:1}).addTo(camadaPontosTiroMapaGeral);
+      fim.bindTooltip(`⚫ Fim do tiro (${formatarDia(r.fim)} ${r.fim ? r.fim.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : ''})`,{direction:"top"});
+      fim.bindPopup(`<strong>Fim do tiro - Ocorrência ${index+1}</strong><br>Data: ${formatarDia(r.data)}<br>Operação: ${escaparHTML(r.operacao||"—")}<br>Equipamento: ${escaparHTML(r.equipamento||"—")}<br>Operador: ${escaparHTML(r.operador||"—")}<br>Grupo: ${escaparHTML(r.grupoOperacao||"—")}<br>Metros: ${Number(r.metros||0).toLocaleString("pt-BR",{maximumFractionDigits:2})} m`);
+      fim.on("click",()=>destacarOcorrenciaMapaGeral(r));
+    }
+
     if(r.blocoLabel){const key=chaveFiltro(r.blocoLabel);if(!blocosUsados.has(key))blocosUsados.set(key,r.blocoLabel);}
   });
-  // Desenha apenas os polígonos de blocos relacionados às ocorrências filtradas.
+
+  // Camada isolada de blocos: desenha e controla visibilidade por nível de zoom
+  camadaBlocosMapaGeral = L.layerGroup();
   for(const label of blocosUsados.values()){
     const bloco=blocos.find(b=>normalizarTexto(b.label)===normalizarTexto(label));
     if(!bloco||!Array.isArray(bloco.polygons))continue;
     bloco.polygons.forEach(poly=>{
-      L.polygon(poly.map(ring=>ring.map(([lon,lat])=>[lat,lon])),{color:"#2563eb",weight:2,fillColor:"#60a5fa",fillOpacity:.045,dashArray:"7 6"}).addTo(grupo);
+      L.polygon(poly.map(ring=>ring.map(([lon,lat])=>[lat,lon])),{color:"#2563eb",weight:1.8,fillColor:"#60a5fa",fillOpacity:.035,dashArray:"6 5"}).addTo(camadaBlocosMapaGeral);
     });
   }
+
   const legenda=document.getElementById("legendaMapaGeral");
   if(legenda){
-    legenda.innerHTML=mapaCores.size?[...mapaCores.entries()].map(([key,cor])=>{const label=key;return `<span class="mapa-legenda-item"><i class="mapa-legenda-cor" style="background:${cor}"></i>${escaparHTML(label)}</span>`}).join("")+`<span class="mapa-legenda-item"><i class="mapa-legenda-cor bloco"></i>Bloco</span>`:'<span>Nenhuma ocorrência com coordenada válida.</span>';
+    let html = mapaCores.size?[...mapaCores.entries()].map(([key,cor])=>`<span class="mapa-legenda-item"><i class="mapa-legenda-cor" style="background:${cor}"></i>${escaparHTML(key)}</span>`).join(""):'';
+    html += `
+      <span class="mapa-legenda-item"><i class="mapa-legenda-cor" style="background:#bfdbfe;border:1px dashed #2563eb"></i>Bloco (zoom ≥ 13)</span>
+      <span class="mapa-legenda-item"><i class="mapa-legenda-cor" style="background:#bbf7d0;border:1.5px solid #16a34a;border-radius:50%"></i>Início do tiro (claro, zoom ≥ 15)</span>
+      <span class="mapa-legenda-item"><i class="mapa-legenda-cor" style="background:#14532d;border:1.5px solid #fff;border-radius:50%"></i>Fim do tiro (escuro, zoom ≥ 15)</span>
+    `;
+    legenda.innerHTML = html;
   }
   const status=document.getElementById("statusMapaGeral");
   if(status)status.textContent=`${v.length.toLocaleString("pt-BR")} ocorrência(s) • ${linhas.toLocaleString("pt-BR")} trajetória(s) • ${pontos.toLocaleString("pt-BR")} ponto(s) no mapa`;
   if(bounds.isValid()){
     mapaOcorrenciasGeral.fitBounds(bounds.pad(.10),{maxZoom:16});
-    setTimeout(()=>{mapaOcorrenciasGeral.invalidateSize();mapaOcorrenciasGeral.fitBounds(bounds.pad(.10),{maxZoom:16});},180);
+    setTimeout(()=>{
+      mapaOcorrenciasGeral.invalidateSize();
+      mapaOcorrenciasGeral.fitBounds(bounds.pad(.10),{maxZoom:16});
+      atualizarVisibilidadeCamadasDetalhadasMapaGeral();
+    },180);
   }else{
     mapaOcorrenciasGeral.setView([-20.0,-50.0],5);
-    setTimeout(()=>mapaOcorrenciasGeral.invalidateSize(),180);
+    setTimeout(()=>{
+      mapaOcorrenciasGeral.invalidateSize();
+      atualizarVisibilidadeCamadasDetalhadasMapaGeral();
+    },180);
   }
+  atualizarVisibilidadeCamadasDetalhadasMapaGeral();
 }
 function ajustarMapaGeralOcorrencias(){
   if(!mapaOcorrenciasGeral)return;
@@ -2439,14 +2821,16 @@ function ajustarMapaGeralOcorrencias(){
   v.forEach(r=>(r.pontosMapa||[]).forEach(p=>{if(Number.isFinite(p.lat)&&Number.isFinite(p.lon))bounds.extend([p.lat,p.lon]);}));
   if(bounds.isValid())mapaOcorrenciasGeral.fitBounds(bounds.pad(.10),{maxZoom:16});
   mapaOcorrenciasGeral.invalidateSize();
+  atualizarVisibilidadeCamadasDetalhadasMapaGeral();
 }
-function alterarModoCoresMapa(modo){modoCoresMapa=modo||"operador";renderizarMapaOcorrenciasGeral();}
+function alterarModoCoresMapa(modo){modoCoresMapa=modo||"operacao";renderizarMapaOcorrenciasGeral();}
 function destacarOcorrenciaMapaGeral(r){
   if(!r||!mapaOcorrenciasGeral)return;
   ocorrenciaMapaGeralDestacada=r;
   const pts=(r.pontosMapa||[]).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon));
   if(!pts.length)return;
-  mapaOcorrenciasGeral.fitBounds(L.latLngBounds(pts.map(p=>[p.lat,p.lon])).pad(.25));
+  mapaOcorrenciasGeral.fitBounds(L.latLngBounds(pts.map(p=>[p.lat,p.lon])).pad(.25), {maxZoom: 16});
+  atualizarVisibilidadeCamadasDetalhadasMapaGeral();
 }
 function focarOcorrenciaNoMapa(r){
   if(!r || typeof L === "undefined")return;
@@ -2478,8 +2862,15 @@ function renderizarFiltrosOcorrencias(){
   construirChecksFiltro("unidadesFiltro",unidades,filtrosOcorrencias.unidades,"unidades");
   const dias=resultados.map(r=>dataSomenteDia(r.data)).filter(Boolean).sort();
   const di=document.getElementById("filtroDataInicio"),df=document.getElementById("filtroDataFim");
-  if(di&&dias.length){di.min=dias[0];di.max=dias[dias.length-1];di.value=filtrosOcorrencias.dataInicio;}
-  if(df&&dias.length){df.min=dias[0];df.max=dias[dias.length-1];df.value=filtrosOcorrencias.dataFim;}
+  if(di&&dias.length){di.placeholder="DD/MM/AAAA";if(!di.value&&filtrosOcorrencias.dataInicio)di.value=isoParaDataBR(filtrosOcorrencias.dataInicio);}
+  if(df&&dias.length){df.placeholder="DD/MM/AAAA";if(!df.value&&filtrosOcorrencias.dataFim)df.value=isoParaDataBR(filtrosOcorrencias.dataFim);}
+  inicializarFlatpickrFiltro();
+  if(fpFiltroResultados && dias.length){
+    const dIni = parseDataBR(isoParaDataBR(dias[0]));
+    const dFim = parseDataBR(isoParaDataBR(dias[dias.length-1]));
+    if(dIni) fpFiltroResultados.set('minDate', dIni);
+    if(dFim) fpFiltroResultados.set('maxDate', dFim);
+  }
   const mm=resultados.map(r=>Number(r.metros)||0),tt=resultados.map(r=>Number(r.toneladas)||0);
   const eMi=document.getElementById("filtroMetrosMin"),eMa=document.getElementById("filtroMetrosMax"),eTi=document.getElementById("filtroToneladasMin"),eTa=document.getElementById("filtroToneladasMax");
   if(eMi&&mm.length){eMi.min=Math.min(...mm);eMi.max=Math.max(...mm);eMi.value=filtrosOcorrencias.metrosMin;}
@@ -2605,12 +2996,92 @@ function renderizarInsightsFiltroOcorrencias(){
   ].map(([l,x])=>`<div class="filtro-insight-metrica"><span>${l}</span><strong>${x}</strong></div>`).join("");
   if(resumo)resumo.textContent=`${v.length.toLocaleString("pt-BR")} ocorrência(s) • ${unidades.length.toLocaleString("pt-BR")} unidade(s)`;
 
-  const opMap=new Map();v.forEach(r=>{const op=valorFiltro(r.operador);opMap.set(op,(opMap.get(op)||0)+1);});
-  const ops=[...opMap.entries()].sort((a,b)=>b[1]-a[1]);
-  if(!ops.length){pizza.innerHTML='<div class="filtro-insights-vazio">Nenhum operador identificado no filtro atual.</div>';}else{
-    const itens=ops.map(([label,valor],i)=>({label,valor,cor:CORES_MAPA_OCORRENCIAS[i%CORES_MAPA_OCORRENCIAS.length]}));
-    const pie=construirPizzaCSS(itens);
-    pizza.innerHTML=`<div class="pizza-operadores-layout"><div class="grafico-pizza-operadores" style="background:${pie.background}"><div class="pizza-centro">${ops.length.toLocaleString("pt-BR")} operador(es)<br>${v.length.toLocaleString("pt-BR")} ocorr.</div></div><div class="legenda-pizza-operadores">${itens.map(x=>`<div class="legenda-pizza-item"><i style="background:${x.cor}"></i><span title="${escaparHTML(x.label)}">${escaparHTML(x.label)}</span><strong>${x.valor.toLocaleString("pt-BR")}</strong></div>`).join("")}</div></div>`;
+  const metricaSel = document.getElementById("metricaPizzaInsights")?.value || "ocorrencias";
+  const agrupamentoSel = document.getElementById("agrupamentoPizzaInsights")?.value || "operador";
+  const limiteSel = document.getElementById("limitePizzaInsights")?.value || "top8";
+
+  const tituloEl = document.getElementById("tituloPizzaInsights");
+  if(tituloEl){
+    const rotulosAgrup = { operador: "operador", operacao: "operação", grupoOperacao: "grupo de operação", equipamento: "equipamento" };
+    const rotulosMetrica = { ocorrencias: "ocorrências", duracao: "horas", metros: "metros", toneladas: "toneladas" };
+    tituloEl.innerHTML = `🥧 Distribuição de ${rotulosMetrica[metricaSel] || "ocorrências"} por ${rotulosAgrup[agrupamentoSel] || "operador"}`;
+  }
+
+  const agrupMap = new Map();
+  v.forEach(r => {
+    let chave = "Não informado";
+    if(agrupamentoSel === "operacao") chave = valorFiltro(r.operacao);
+    else if(agrupamentoSel === "grupoOperacao") chave = valorFiltro(r.grupoOperacao);
+    else if(agrupamentoSel === "equipamento") chave = valorFiltro(r.equipamento);
+    else chave = valorFiltro(r.operador);
+
+    let val = 0;
+    if(metricaSel === "duracao") val = (Number(r.duracao) || 0) / 3600000;
+    else if(metricaSel === "metros") val = Number(r.metros) || 0;
+    else if(metricaSel === "toneladas") val = Number(r.toneladas) || 0;
+    else val = 1;
+
+    agrupMap.set(chave, (agrupMap.get(chave) || 0) + val);
+  });
+
+  const listaOrdenada = [...agrupMap.entries()].sort((a,b)=>b[1]-a[1]);
+  if(!listaOrdenada.length){
+    pizza.innerHTML='<div class="filtro-insights-vazio">Nenhum dado identificado no filtro atual.</div>';
+  }else{
+    let limite = listaOrdenada.length;
+    if(limiteSel === "top5") limite = 5;
+    else if(limiteSel === "top8") limite = 8;
+
+    let fatias = [];
+    if(listaOrdenada.length <= limite || limiteSel === "todos"){
+      fatias = listaOrdenada.map(([label, valor]) => ({ label, valor }));
+    }else{
+      fatias = listaOrdenada.slice(0, limite).map(([label, valor]) => ({ label, valor }));
+      const somaOutros = listaOrdenada.slice(limite).reduce((s,x)=>s+x[1], 0);
+      if(somaOutros > 0){
+        fatias.push({ label: "Outros", valor: somaOutros, outros: true });
+      }
+    }
+
+    const fatiasComCores = fatias.map((f, i) => ({
+      ...f,
+      cor: f.outros ? "#94a3b8" : CORES_MAPA_OCORRENCIAS[i % CORES_MAPA_OCORRENCIAS.length]
+    }));
+
+    const pie = construirPizzaCSS(fatiasComCores);
+    const totalMetrica = fatias.reduce((s,x)=>s+x.valor, 0);
+
+    const formatarValorLegenda = (val) => {
+      if(metricaSel === "duracao") return formatarNumeroInsight(val, 1) + " h";
+      if(metricaSel === "metros") return formatarNumeroInsight(val, 0) + " m";
+      if(metricaSel === "toneladas") return formatarNumeroInsight(val, 1) + " t";
+      return Math.round(val).toLocaleString("pt-BR") + " ocorr.";
+    };
+
+    pizza.innerHTML = `
+      <div class="pizza-operadores-layout">
+        <div class="grafico-pizza-operadores" style="background:${pie.background}">
+          <div class="pizza-centro">
+            <span style="font-size:12px;font-weight:800;color:var(--verde-950);">${listaOrdenada.length.toLocaleString("pt-BR")}</span>
+            <span style="font-size:10px;color:var(--verde-700);">${agrupamentoSel === "operacao" ? "operações" : agrupamentoSel === "equipamento" ? "máquinas" : agrupamentoSel === "grupoOperacao" ? "grupos" : "operadores"}</span>
+            <span style="font-size:10.5px;font-weight:700;color:var(--verde-900);margin-top:2px;">${formatarValorLegenda(totalMetrica)}</span>
+          </div>
+        </div>
+        <div class="legenda-pizza-operadores">
+          ${fatiasComCores.map(x=>{
+            const pct = totalMetrica ? ((x.valor/totalMetrica)*100).toFixed(1) : "0.0";
+            const clickAttr = x.outros ? "" : `onclick="filtrarOcorrenciasPorInsight('${escaparHTML(x.label).replace(/'/g, "\\'")}')" style="cursor:pointer;" title="Clique para filtrar por ${escaparHTML(x.label)}"`;
+            return `
+              <div class="legenda-pizza-item" ${clickAttr}>
+                <i style="background:${x.cor}"></i>
+                <span title="${escaparHTML(x.label)}">${escaparHTML(x.label)}</span>
+                <strong title="${pct}% do total">${formatarValorLegenda(x.valor)} <span style="font-size:10px;font-weight:500;color:#64748b;margin-left:2px">(${pct}%)</span></strong>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
   }
 
   const porUnidade=new Map();
@@ -2624,6 +3095,18 @@ function renderizarInsightsFiltroOcorrencias(){
     const max={ocorrencias:Math.max(...us.map(x=>x[1].ocorrencias),1),duracao:Math.max(...us.map(x=>x[1].duracao),1),metros:Math.max(...us.map(x=>x[1].metros),1),toneladas:Math.max(...us.map(x=>x[1].toneladas),1)};
     comparacao.innerHTML=`<div class="comparacao-unidades">${us.map(([u,x])=>`<div class="comparacao-unidade"><div class="comparacao-unidade-head"><strong>${escaparHTML(u)}</strong><span>${x.ocorrencias.toLocaleString("pt-BR")} ocorrência(s)</span></div><div class="comparacao-barras"><div class="comparacao-linha"><span>Horas</span><div class="comparacao-track"><div class="comparacao-fill" style="width:${(x.duracao/max.duracao*100).toFixed(1)}%"></div></div><div class="comparacao-valor">${formatarDuracao(x.duracao)}</div></div><div class="comparacao-linha"><span>Metros</span><div class="comparacao-track"><div class="comparacao-fill" style="width:${(x.metros/max.metros*100).toFixed(1)}%"></div></div><div class="comparacao-valor">${formatarNumeroInsight(x.metros,0)} m</div></div><div class="comparacao-linha"><span>Toneladas</span><div class="comparacao-track"><div class="comparacao-fill" style="width:${(x.toneladas/max.toneladas*100).toFixed(1)}%"></div></div><div class="comparacao-valor">${formatarNumeroInsight(x.toneladas,1)} t</div></div></div></div>`).join("")}</div>`;
   }
+}
+
+function filtrarOcorrenciasPorInsight(valor){
+  const buscaInput = document.getElementById("buscaOcorrencias");
+  if(!buscaInput) return;
+  if(buscaInput.value === valor){
+    buscaInput.value = "";
+  } else {
+    buscaInput.value = valor;
+  }
+  buscaOcorrenciasTermo = normalizarBusca(buscaInput.value);
+  aplicarFiltrosOcorrencias();
 }
 
 function renderizarResultadoTelemetria(cfg){
@@ -2685,56 +3168,86 @@ async function analisar(){
   }
 
   try{
+    if(processamentoTelemetriaAtivo){
+      console.warn("Processamento anterior travado ou ativo. Reiniciando estado...");
+      processamentoTelemetriaAtivo = false;
+      if(readerTelemetriaAtual){
+        try{ await readerTelemetriaAtual.cancel(); }catch(e){}
+        readerTelemetriaAtual = null;
+      }
+    }
 
-    arquivoTelemetriaSelecionado = await prepararArquivoTelemetriaCompartilhada();
+    const lista = await window.telemetriaBase.listar(TIPO_TELEMETRIA_PAGINA);
+    if(lista && lista.length > 0){
+      arquivoTelemetriaSelecionado = await prepararArquivoTelemetriaCompartilhada();
+      if(!arquivoTelemetriaSelecionado){
+        return;
+      }
 
-    if(arquivoTelemetriaSelecionado){
       if(!validarPeriodoTelemetria()){
         alert("⚠️ Escolha um período válido dentro das datas disponíveis da base.");
         return;
       }
 
-      if(processamentoTelemetriaAtivo) return;
+      processamentoTelemetriaAtivo = true;
 
-    processamentoTelemetriaAtivo = true;
+      try{
+        await analisarArquivoTelemetriaGrande(arquivoTelemetriaSelecionado);
+      }catch(e){
+        processamentoTelemetriaAtivo = false;
+        console.error("Erro ao analisar arquivo grande:", e);
 
-    try{
-      await analisarArquivoTelemetriaGrande(arquivoTelemetriaSelecionado);
-    }catch(e){
-      processamentoTelemetriaAtivo = false;
+        const status = document.getElementById("status");
+        if(status) status.textContent = "Erro ao processar o arquivo: " + (e.message || e);
 
-      console.error(e);
+        const statusArquivo = document.getElementById("statusTelemetria");
+        if(statusArquivo){
+          statusArquivo.textContent = "Erro no processamento";
+          statusArquivo.className = "badge bad";
+        }
 
-      document.getElementById("status").textContent =
-        "Erro ao processar o arquivo: " + (e.message || e);
-
-      const statusArquivo = document.getElementById("statusTelemetria");
-      statusArquivo.textContent = "Erro no processamento";
-      statusArquivo.className = "badge bad";
-
-      alert(
-        "Não foi possível processar o arquivo de telemetria.\n\n"+
-        (e.message || e)
-      );
+        alert(
+          "Não foi possível processar o arquivo de telemetria.\n\n"+
+          (e.message || e)
+        );
+      }finally{
+        processamentoTelemetriaAtivo = false;
+      }
+      return;
     }
 
-    return;
-  }
-
-  // Mantém o comportamento original para dados colados no textarea.
-  analisarTexto();
+    const elDados = document.getElementById("dados");
+    if(elDados && elDados.value.trim()){
+      analisarTexto();
+    } else {
+      alert(`⚠️ Nenhuma base de telemetria encontrada para COLHEDORA.\n\nPor favor, adicione os arquivos CSV na página 🗄️ Bases.`);
+    }
+  }catch(errGeral){
+    console.error("Erro geral na análise:", errGeral);
+    alert("Ocorreu um erro ao iniciar a análise: " + (errGeral.message || errGeral));
   }finally{
-    if(btnAnalise){btnAnalise.disabled=false;btnAnalise.textContent=btnAnalise.dataset.original||"🔎 Analisar ocorrência";}
+    processamentoTelemetriaAtivo = false;
+    if(btnAnalise){
+      btnAnalise.disabled = false;
+      btnAnalise.textContent = btnAnalise.dataset.original || "🔎 Analisar ocorrência";
+    }
   }
 }
 
 function analisarTexto(){
-  const texto=document.getElementById("dados").value.trim();
-  const status=document.getElementById("status");
-  resultados=[];
-  buscaOcorrenciasTermo="";
+  const elDados = document.getElementById("dados");
+  if(!elDados || !elDados.value.trim()){
+    const status = document.getElementById("status");
+    if(status) status.textContent = "Cole os dados do Excel antes de analisar.";
+    return;
+  }
+  const texto = elDados.value.trim();
+  const status = document.getElementById("status");
+  resultados = [];
+  buscaOcorrenciasTermo = "";
   clearTimeout(timerBuscaOcorrencias);
-  const busca=document.getElementById("buscaOcorrencias");if(busca)busca.value="";
+  const busca = document.getElementById("buscaOcorrencias");
+  if(busca) busca.value = "";
   const meta=document.getElementById("analiseMeta");if(meta)meta.style.display="none";
   unidadesSelecionadas.clear();
   filtroUnidadesAtivo=false;
@@ -3431,9 +3944,12 @@ function limparTudo(){
   if(wrap) wrap.style.display="none";
   if(fill) fill.style.width="0%";
 
-  document.getElementById("dados").value="";
-  document.getElementById("colunas").innerHTML="";
-  document.getElementById("status").textContent="Aguardando dados.";
+  const elDados = document.getElementById("dados");
+  if(elDados) elDados.value="";
+  const colunas = document.getElementById("colunas");
+  if(colunas) colunas.innerHTML="";
+  const status = document.getElementById("status");
+  if(status) status.textContent="Aguardando dados.";
   document.getElementById("resumo").style.display="none";
   document.getElementById("resultadoCard").style.display="none";
   document.getElementById("btnExportar").style.display="none";
@@ -3447,6 +3963,69 @@ function limparTudo(){
   if(checkTodas){checkTodas.checked=false;checkTodas.indeterminate=false;}
 
   limparTelemetriaDB();
+  if(window.telemetriaAnaliseCache){
+    window.telemetriaAnaliseCache.limpar("colhedora");
+  }
+}
+
+async function restaurarUltimaAnaliseSeExistir(){
+  if(!window.telemetriaAnaliseCache) return;
+  try{
+    const dadosSalvos = await window.telemetriaAnaliseCache.carregar("colhedora");
+    if(!dadosSalvos || !dadosSalvos.resultados || !dadosSalvos.resultados.length) return;
+    
+    resultados = dadosSalvos.resultados;
+    
+    if(dadosSalvos.periodo){
+      const ini = document.getElementById("dataInicialTelemetria");
+      const fim = document.getElementById("dataFinalTelemetria");
+      if(ini && dadosSalvos.periodo.inicio) ini.value = dadosSalvos.periodo.inicio;
+      if(fim && dadosSalvos.periodo.fim) fim.value = dadosSalvos.periodo.fim;
+      if(typeof fpPeriodoTelemetria !== "undefined" && fpPeriodoTelemetria && dadosSalvos.periodo.inicio && dadosSalvos.periodo.fim){
+        const d1 = parseDataBR(dadosSalvos.periodo.inicio);
+        const d2 = parseDataBR(dadosSalvos.periodo.fim);
+        if(d1 && d2) fpPeriodoTelemetria.setDate([d1, d2], false);
+      }
+      validarPeriodoTelemetria();
+    }
+
+    if(dadosSalvos.filtros && Array.isArray(dadosSalvos.filtros.grupos) && dadosSalvos.filtros.grupos.length){
+      dadosSalvos.filtros.grupos.forEach(g => {
+        estadoFiltroOperacoes.grupos.add(g);
+      });
+      if(Array.isArray(dadosSalvos.filtros.operacoes)){
+        dadosSalvos.filtros.operacoes.forEach(([g, ops]) => {
+          estadoFiltroOperacoes.operacoes.set(g, new Set(ops));
+        });
+      }
+      document.querySelectorAll("#gruposOperacaoChecks input").forEach(input => {
+        if(estadoFiltroOperacoes.grupos.has(chaveGrupoOperacao(input.dataset.grupo))){
+          input.checked = true;
+        }
+      });
+      atualizarPainelOperacoes();
+    }
+    
+    const cfg = dadosSalvos.qualidade || {
+      totalPontosLidos: resultados.reduce((s,x)=>s+(x.pontos||0),0),
+      pontosValidos: resultados.reduce((s,x)=>s+(x.pontos||0),0),
+      pontosForaDeBloco: 0,
+      linhasDados: resultados.reduce((s,x)=>s+(x.pontos||0),0),
+      dataHoraInvalida: 0,
+      coordenadasValidas: resultados.reduce((s,x)=>s+(x.pontos||0),0),
+      coordenadasInvalidas: 0
+    };
+    
+    renderizarResultadoTelemetria(cfg);
+
+    const statusEl = document.getElementById("status");
+    if(statusEl){
+      const horaSalvo = dadosSalvos.timestamp ? new Date(dadosSalvos.timestamp).toLocaleTimeString("pt-BR") : "";
+      statusEl.innerHTML = `<span style="color:#15803d;font-weight:700;">✓ Análise anterior mantida (${resultados.length.toLocaleString("pt-BR")} ocorrências${horaSalvo ? " às " + horaSalvo : ""})</span>`;
+    }
+  }catch(e){
+    console.warn("Não foi possível restaurar análise da colhedora:", e);
+  }
 }
 
 window.addEventListener("load",async()=>{
@@ -3464,6 +4043,7 @@ window.addEventListener("load",async()=>{
   }
 
   await inicializarBasesCompartilhadas();
+  await restaurarUltimaAnaliseSeExistir();
 });
 atualizarFiltroBlocoUI();
 

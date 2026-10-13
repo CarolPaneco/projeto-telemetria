@@ -682,14 +682,20 @@ body.menu-collapsed .menu-footer-icon {
 body .app-container {
   margin-left:
     var(--menu-width-open);
-
+  width:
+    calc(100% - var(--menu-width-open));
+  box-sizing:
+    border-box;
   transition:
-    margin-left .25s ease;
+    margin-left .25s ease,
+    width .25s ease;
 }
 
 body.menu-collapsed .app-container {
   margin-left:
     var(--menu-width-closed);
+  width:
+    calc(100% - var(--menu-width-closed));
 }
 
 
@@ -698,14 +704,20 @@ body.menu-collapsed .app-container {
 body .main-content {
   margin-left:
     var(--menu-width-open);
-
+  width:
+    calc(100% - var(--menu-width-open));
+  box-sizing:
+    border-box;
   transition:
-    margin-left .25s ease;
+    margin-left .25s ease,
+    width .25s ease;
 }
 
 body.menu-collapsed .main-content {
   margin-left:
     var(--menu-width-closed);
+  width:
+    calc(100% - var(--menu-width-closed));
 }
 
 

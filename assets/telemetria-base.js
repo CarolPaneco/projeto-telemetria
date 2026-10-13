@@ -76,47 +76,67 @@
   }
 
 
-  async function listar(tipo) {
+  async function repararRegistroSeNecessario(reg) {
+    if (!reg) return reg;
+    let minValido = dataValida(reg.dataMinMs);
+    let maxValido = dataValida(reg.dataMaxMs);
 
-    const db = await abrir();
-
-    return new Promise(
-      (resolve, reject) => {
-
-        const tx =
-          db.transaction(
-            STORE,
-            'readonly'
-          );
-
-        const store =
-          tx.objectStore(STORE);
-
-        const index =
-          store.index('tipo');
-
-        const req =
-          index.getAll(tipo);
-
-        req.onsuccess = () => {
-
-          const dados =
-            req.result || [];
-
-          dados.sort(
-            (a, b) =>
-              (b.ultimaAtualizacao || 0) -
-              (a.ultimaAtualizacao || 0)
-          );
-
-          resolve(dados);
-        };
-
-        req.onerror = () =>
-          reject(req.error);
-
+    if (minValido && maxValido) {
+      if (reg.dataMinMs > reg.dataMaxMs) {
+        const tmp = reg.dataMinMs;
+        reg.dataMinMs = reg.dataMaxMs;
+        reg.dataMaxMs = tmp;
+        reg.tipo_data = `${reg.tipo}|${reg.dataMinMs}`;
+        try { await salvar(reg); } catch(e){}
       }
-    );
+      return reg;
+    }
+
+    try {
+      if (reg.body && reg.header && typeof reg.body.slice === 'function') {
+        const textoIni = await reg.body.slice(0, Math.min(reg.body.size, 2 * 1024 * 1024)).text();
+        const linhas = textoIni.split(/\r?\n/);
+        const novoMin = encontrarData(linhas, reg.header);
+        const novoMax = await encontrarUltimaData(reg.body, reg.header);
+        let dMin = novoMin || (minValido ? reg.dataMinMs : null);
+        let dMax = novoMax || (maxValido ? reg.dataMaxMs : null);
+        if (dMin && dMax && dMin > dMax) {
+          const tmp = dMin;
+          dMin = dMax;
+          dMax = tmp;
+        }
+        if (dMin) reg.dataMinMs = dMin;
+        if (dMax) reg.dataMaxMs = dMax;
+        if (reg.dataMinMs) {
+          reg.tipo_data = `${reg.tipo}|${reg.dataMinMs}`;
+        }
+        await salvar(reg);
+      }
+    } catch(e) {
+      console.warn('Falha ao auto-reparar registro de telemetria:', e);
+    }
+    return reg;
+  }
+
+  async function listar(tipo) {
+    const db = await abrir();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly');
+      const store = tx.objectStore(STORE);
+      const index = store.index('tipo');
+      const req = index.getAll(tipo);
+
+      req.onsuccess = async () => {
+        const dados = req.result || [];
+        for (let i = 0; i < dados.length; i++) {
+          dados[i] = await repararRegistroSeNecessario(dados[i]);
+        }
+        dados.sort((a, b) => (b.ultimaAtualizacao || 0) - (a.ultimaAtualizacao || 0));
+        resolve(dados);
+      };
+
+      req.onerror = () => reject(req.error);
+    });
   }
 
 
@@ -176,27 +196,50 @@
 
 
   async function remover(id) {
-
     const db = await abrir();
-
     return new Promise(
       (resolve, reject) => {
-
         const tx =
           db.transaction(
             STORE,
             'readwrite'
           );
-
         tx.objectStore(STORE)
           .delete(id);
-
-        tx.oncomplete = () =>
+        tx.oncomplete = () => {
+          db.close();
           resolve();
-
-        tx.onerror = () =>
+        };
+        tx.onerror = () => {
+          db.close();
           reject(tx.error);
+        };
+      }
+    );
+  }
 
+  async function limparTipo(tipo) {
+    const lista = await listar(tipo);
+    const db = await abrir();
+    return new Promise(
+      (resolve, reject) => {
+        const tx =
+          db.transaction(
+            STORE,
+            'readwrite'
+          );
+        const store = tx.objectStore(STORE);
+        for (const item of lista) {
+          store.delete(item.id);
+        }
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
       }
     );
   }
@@ -279,6 +322,47 @@
 
     return `${y}-${m}-${day}`;
   }
+
+
+  function inputDateBR(ms) {
+    if (!ms || isNaN(ms)) return '';
+    const d = new Date(ms);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${day}/${m}/${y}`;
+  }
+
+
+  function parseDateBR(str) {
+    if (!str) return null;
+    str = String(str).trim();
+    if (str.includes(' to ')) str = str.split(' to ')[0].trim();
+    if (str.includes(' até ')) str = str.split(' até ')[0].trim();
+    const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (m) {
+      const d = parseInt(m[1], 10);
+      const mon = parseInt(m[2], 10) - 1;
+      const y = parseInt(m[3], 10);
+      const dt = new Date(y, mon, d, 0, 0, 0);
+      if (dt.getFullYear() === y && dt.getMonth() === mon && dt.getDate() === d) return dt;
+    }
+    const iso = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+    if (iso) {
+      const y = parseInt(iso[1], 10);
+      const mon = parseInt(iso[2], 10) - 1;
+      const d = parseInt(iso[3], 10);
+      const dt = new Date(y, mon, d, 0, 0, 0);
+      if (dt.getFullYear() === y && dt.getMonth() === mon && dt.getDate() === d) return dt;
+    }
+    const ts = Date.parse(str);
+    if (!isNaN(ts)) {
+      const dt = new Date(ts);
+      if (!isNaN(dt.getTime())) return dt;
+    }
+    return null;
+  }
+
 
 
   async function primeiraLinha(file) {
@@ -376,11 +460,19 @@
         header
       );
 
+    let dMin = primeiraData;
+    let dMax = ultimaData;
+    if (dMin && dMax && dMin > dMax) {
+      const tmp = dMin;
+      dMin = dMax;
+      dMax = tmp;
+    }
+
     const dataMinMs =
-      primeiraData || null;
+      dMin || null;
 
     const dataMaxMs =
-      ultimaData || null;
+      dMax || null;
 
     const id =
       idArquivo(
@@ -438,190 +530,122 @@
   }
 
 
-  function encontrarData(
-    linhas,
-    header
-  ) {
-
-    for (
-      const linha of linhas
-    ) {
-
-      if (!linha.trim()) {
-        continue;
-      }
-
-      const campos =
-        linha.split(';');
-
-      for (
-        const campo of campos
-      ) {
-
-        const ms =
-          parseData(campo);
-
-        if (ms) {
-          return ms;
-        }
-      }
-
-      const camposVirgula =
-        linha.split(',');
-
-      for (
-        const campo of camposVirgula
-      ) {
-
-        const ms =
-          parseData(campo);
-
-        if (ms) {
-          return ms;
-        }
-      }
-    }
-
-    return null;
+  function detectarSeparadorHeader(linha) {
+    if (!linha) return ';';
+    const candidatos = [';', '\t', ',', '|'];
+    return candidatos.sort((a,b) => (linha.split(b).length - linha.split(a).length))[0];
   }
 
-
-  async function encontrarUltimaData(
-    file,
-    header
-  ) {
-
-    const chunkSize =
-      4 * 1024 * 1024;
-
-    let inicio =
-      Math.max(
-        0,
-        file.size - chunkSize
-      );
-
-    const texto =
-      await file
-        .slice(inicio)
-        .text();
-
-    const linhas =
-      texto.split(/\r?\n/);
-
-    for (
-      let i = linhas.length - 1;
-      i >= 0;
-      i--
-    ) {
-
-      const linha =
-        linhas[i];
-
-      if (!linha) continue;
-
-      const campos =
-        linha.split(';');
-
-      for (
-        let j = campos.length - 1;
-        j >= 0;
-        j--
-      ) {
-
-        const ms =
-          parseData(
-            campos[j]
-          );
-
-        if (ms) {
-          return ms;
-        }
-      }
-
-      const camposVirgula =
-        linha.split(',');
-
-      for (
-        let j = camposVirgula.length - 1;
-        j >= 0;
-        j--
-      ) {
-
-        const ms =
-          parseData(
-            camposVirgula[j]
-          );
-
-        if (ms) {
-          return ms;
-        }
-      }
-    }
-
-    return null;
+  function acharIndiceData(header, sep) {
+    if (!header) return -1;
+    const colunas = header.split(sep).map(c => 
+      c.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    );
+    let idx = colunas.findIndex(c => (c.includes('data') && c.includes('hora')) || c === 'data hora' || c === 'data/hora' || c === 'data_hora');
+    if (idx >= 0) return idx;
+    idx = colunas.findIndex(c => c === 'data' || c === 'date' || c === 'datetime' || c === 'timestamp');
+    if (idx >= 0) return idx;
+    idx = colunas.findIndex(c => c.includes('data') || c.includes('date') || c.startsWith('dh_') || c === 'dh');
+    return idx;
   }
 
+  function dataValida(ms) {
+    if (!ms || !Number.isFinite(ms)) return false;
+    const y = new Date(ms).getFullYear();
+    return y >= 1990 && y <= 2100;
+  }
 
   function parseData(valor) {
-
     if (!valor) return null;
-
-    const texto =
-      String(valor)
-        .trim()
-        .replace(/^"|"$/g, '');
-
+    const texto = String(valor).trim().replace(/^["']|["']$/g, '');
     if (!texto) return null;
 
-    const br =
-      texto.match(
-        /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
-      );
+    if (/^\d{1,8}$/.test(texto)) return null;
 
+    const br = texto.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?)?$/);
     if (br) {
-
-      const d =
-        Number(br[1]);
-
-      const m =
-        Number(br[2]) - 1;
-
-      const y =
-        Number(br[3]);
-
-      const hh =
-        Number(br[4] || 0);
-
-      const mm =
-        Number(br[5] || 0);
-
-      const ss =
-        Number(br[6] || 0);
-
-      const dt =
-        new Date(
-          y,
-          m,
-          d,
-          hh,
-          mm,
-          ss
-        );
-
-      const ms =
-        dt.getTime();
-
-      if (Number.isFinite(ms)) {
-        return ms;
+      const d = Number(br[1]);
+      const m = Number(br[2]) - 1;
+      const y = Number(br[3]);
+      const hh = Number(br[4] || 0);
+      const mm = Number(br[5] || 0);
+      const ss = Number(br[6] || 0);
+      if (y >= 1990 && y <= 2100 && m >= 0 && m <= 11 && d >= 1 && d <= 31) {
+        const dt = new Date(y, m, d, hh, mm, ss);
+        const ms = dt.getTime();
+        if (Number.isFinite(ms)) return ms;
       }
     }
 
-    const iso =
-      Date.parse(texto);
+    const isoMatch = texto.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?)?/);
+    if (isoMatch) {
+      const y = Number(isoMatch[1]);
+      const m = Number(isoMatch[2]) - 1;
+      const d = Number(isoMatch[3]);
+      const hh = Number(isoMatch[4] || 0);
+      const mm = Number(isoMatch[5] || 0);
+      const ss = Number(isoMatch[6] || 0);
+      if (y >= 1990 && y <= 2100 && m >= 0 && m <= 11 && d >= 1 && d <= 31) {
+        const dt = new Date(y, m, d, hh, mm, ss);
+        const ms = dt.getTime();
+        if (Number.isFinite(ms)) return ms;
+      }
+    }
 
-    return Number.isFinite(iso)
-      ? iso
-      : null;
+    if (/^\d{10,13}$/.test(texto)) {
+      const num = Number(texto);
+      const ms = texto.length === 10 ? num * 1000 : num;
+      if (dataValida(ms)) return ms;
+    }
+
+    return null;
+  }
+
+  function encontrarData(linhas, header) {
+    const sep = detectarSeparadorHeader(header || (linhas.length ? linhas[0] : ''));
+    const idx = acharIndiceData(header, sep);
+
+    for (const linha of linhas) {
+      if (!linha || !linha.trim()) continue;
+      const campos = linha.split(sep);
+      if (idx >= 0 && idx < campos.length) {
+        const ms = parseData(campos[idx]);
+        if (ms) return ms;
+      }
+      for (const campo of campos) {
+        const ms = parseData(campo);
+        if (ms) return ms;
+      }
+    }
+
+    return null;
+  }
+
+  async function encontrarUltimaData(file, header) {
+    const chunkSize = 4 * 1024 * 1024;
+    const tamanho = file.size || 0;
+    const inicio = Math.max(0, tamanho - chunkSize);
+    const texto = await file.slice(inicio).text();
+    const linhas = texto.split(/\r?\n/);
+
+    const sep = detectarSeparadorHeader(header || (linhas.length ? linhas[0] : ''));
+    const idx = acharIndiceData(header, sep);
+
+    for (let i = linhas.length - 1; i >= 0; i--) {
+      const linha = linhas[i];
+      if (!linha || !linha.trim()) continue;
+      const campos = linha.split(sep);
+      if (idx >= 0 && idx < campos.length) {
+        const ms = parseData(campos[idx]);
+        if (ms) return ms;
+      }
+      for (let j = campos.length - 1; j >= 0; j--) {
+        const ms = parseData(campos[j]);
+        if (ms) return ms;
+      }
+    }
+
+    return null;
   }
 
 
@@ -867,6 +891,8 @@
 
     remover,
 
+    limparTipo,
+
     resumo,
 
     arquivosParaAnalise,
@@ -878,6 +904,10 @@
     fmtDate,
 
     inputDate,
+
+    inputDateBR,
+
+    parseDateBR,
 
     garantirPersistencia,
 

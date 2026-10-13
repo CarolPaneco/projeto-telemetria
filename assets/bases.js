@@ -80,33 +80,65 @@
   }
 
   /* ---------- CSV / JSON ---------- */
-  function dividirLinha(linha,sep){
-    const out=[]; let atual='',aspas=false;
-    for(let i=0;i<linha.length;i++){
-      const c=linha[i];
-      if(c==='"'){
-        if(aspas && linha[i+1]==='"'){atual+='"';i++;}
-        else aspas=!aspas;
-      }else if(c===sep && !aspas){out.push(atual.trim());atual='';}
-      else atual+=c;
-    }
-    out.push(atual.trim());
-    return out;
-  }
-  function separador(linha){
-    const candidatos=[';','\t',','];
-    return candidatos.sort((a,b)=>dividirLinha(linha,b).length-dividirLinha(linha,a).length)[0];
-  }
   function csv(texto){
-    const linhas=texto.split(/\r?\n/).filter(l=>l.trim()!=='');
-    if(linhas.length<2) return [];
-    const sep=separador(linhas[0]);
-    const headers=dividirLinha(linhas[0],sep).map(x=>normalizar(x).replace(/\s+/g,''));
-    return linhas.slice(1).map(l=>{
-      const row=dividirLinha(l,sep),o={};
-      headers.forEach((h,i)=>o[h]=row[i]??'');
-      return o;
-    });
+    const s = String(texto || '').replace(/^\uFEFF/, '');
+    if(!s.trim()) return [];
+    const primeiraLinha = s.slice(0, 5000).split(/\r?\n/)[0];
+    const candidatos = [';', '\t', ',', '|'];
+    const sep = candidatos.sort((a,b) => (primeiraLinha.split(b).length - primeiraLinha.split(a).length))[0];
+
+    const headers = [];
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    const len = s.length;
+
+    for(let i = 0; i < len; i++){
+      const c = s[i];
+      if(c === '"'){
+        if(inQuotes && s[i + 1] === '"'){
+          field += '"';
+          i++;
+        }else{
+          inQuotes = !inQuotes;
+        }
+      }else if(c === sep && !inQuotes){
+        row.push(field.trim());
+        field = '';
+      }else if((c === '\n' || c === '\r') && !inQuotes){
+        if(c === '\r' && s[i + 1] === '\n') i++;
+        row.push(field.trim());
+        field = '';
+        if(row.length > 1 || (row.length === 1 && row[0] !== '')){
+          if(!headers.length){
+            headers.push(...row.map(h => normalizar(h).replace(/\s+/g, '')));
+          }else{
+            const obj = {};
+            for(let j = 0; j < headers.length; j++){
+              obj[headers[j]] = row[j] ?? '';
+            }
+            rows.push(obj);
+          }
+        }
+        row = [];
+      }else{
+        field += c;
+      }
+    }
+    if(field || row.length){
+      row.push(field.trim());
+      if(row.length > 1 || (row.length === 1 && row[0] !== '')){
+        if(headers.length){
+          const obj = {};
+          for(let j = 0; j < headers.length; j++){
+            obj[headers[j]] = row[j] ?? '';
+          }
+          rows.push(obj);
+        }
+      }
+    }
+    return rows;
   }
   function json(texto){
     const dado=JSON.parse(texto);
@@ -185,8 +217,10 @@
   }
   function dentroAnel(lon,lat,anel){
     let dentro=false;
-    for(let i=0,j=anel.length-1;i<anel.length;j=i++){
-      const [xi,yi]=anel[i],[xj,yj]=anel[j];
+    const len=anel.length;
+    for(let i=0,j=len-1;i<len;j=i++){
+      const pi=anel[i], pj=anel[j];
+      const xi=pi[0], yi=pi[1], xj=pj[0], yj=pj[1];
       const hit=((yi>lat)!==(yj>lat))&&(lon<(xj-xi)*(lat-yi)/(yj-yi)+xi);
       if(hit)dentro=!dentro;
     }
@@ -199,7 +233,7 @@
   }
   function montarBlocos(linhas){
     return linhas.map(o=>{
-      const polygons=geometria(campo(o,['geometry','geom','the_geom']));
+      const polygons=geometria(campo(o,['geometry','geom','the_geom','geometria','shape','wkt','polygon','poligono','geojson']));
       if(!polygons.length)return null;
       const anoSafra=campo(o,['ano_safra','anosafra','safra']);
       const bloco=campo(o,['bloco']),gleba=campo(o,['gleba']),talhao=campo(o,['talhao']),unidade=campo(o,['unidade']);
@@ -208,11 +242,93 @@
     }).filter(Boolean);
   }
 
-  window.encontrarBloco=function(lon,lat){
-    if(!Number.isFinite(lon)||!Number.isFinite(lat))return null;
-    for(const b of window.blocos){
-      const bb=b.bbox;if(lon<bb.minLon||lon>bb.maxLon||lat<bb.minLat||lat>bb.maxLat)continue;
-      for(const poly of b.polygons)if(dentroPoly(lon,lat,poly))return b;
+  const SPATIAL_CELL_SIZE = 0.02; // ~2km
+  let spatialGrid = null;
+  let spatialGridVersion = -1;
+  let ultimoBlocoEncontrado = null;
+  const ultimosBlocosPorEquipamento = new Map();
+
+  function construirIndiceEspacial() {
+    spatialGrid = new Map();
+    const lista = window.blocos || [];
+    for (let i = 0; i < lista.length; i++) {
+      const b = lista[i];
+      const bb = b.bbox;
+      if (!bb || !Number.isFinite(bb.minLon)) continue;
+      const minX = Math.floor(bb.minLon / SPATIAL_CELL_SIZE);
+      const maxX = Math.floor(bb.maxLon / SPATIAL_CELL_SIZE);
+      const minY = Math.floor(bb.minLat / SPATIAL_CELL_SIZE);
+      const maxY = Math.floor(bb.maxLat / SPATIAL_CELL_SIZE);
+      for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+          const k = ((x * 100003 + y) | 0);
+          let cell = spatialGrid.get(k);
+          if (!cell) {
+            cell = [];
+            spatialGrid.set(k, cell);
+          }
+          cell.push(b);
+        }
+      }
+    }
+    spatialGridVersion = lista.length;
+    ultimoBlocoEncontrado = null;
+    ultimosBlocosPorEquipamento.clear();
+  }
+
+  window.encontrarBloco = function(lon, lat, equipamento) {
+    if (!Number.isFinite(lon) || !Number.isFinite(lat) || !window.blocos || !window.blocos.length) return null;
+
+    // 1. Cache temporal por equipamento (evita misses causados por registros intercalados de múltiplas máquinas)
+    if (equipamento && ultimosBlocosPorEquipamento.has(equipamento)) {
+      const bCached = ultimosBlocosPorEquipamento.get(equipamento);
+      const bb = bCached.bbox;
+      if (lon >= bb.minLon && lon <= bb.maxLon && lat >= bb.minLat && lat <= bb.maxLat) {
+        for (let p = 0; p < bCached.polygons.length; p++) {
+          if (dentroPoly(lon, lat, bCached.polygons[p])) {
+            ultimoBlocoEncontrado = bCached;
+            return bCached;
+          }
+        }
+      }
+    }
+
+    // 2. Cache temporal global (caso anterior)
+    if (ultimoBlocoEncontrado) {
+      const bb = ultimoBlocoEncontrado.bbox;
+      if (lon >= bb.minLon && lon <= bb.maxLon && lat >= bb.minLat && lat <= bb.maxLat) {
+        for (let p = 0; p < ultimoBlocoEncontrado.polygons.length; p++) {
+          if (dentroPoly(lon, lat, ultimoBlocoEncontrado.polygons[p])) {
+            if (equipamento) ultimosBlocosPorEquipamento.set(equipamento, ultimoBlocoEncontrado);
+            return ultimoBlocoEncontrado;
+          }
+        }
+      }
+    }
+
+    // 3. Garante que a grade espacial está construída e sincronizada com a base
+    if (!spatialGrid || spatialGridVersion !== window.blocos.length) {
+      construirIndiceEspacial();
+    }
+
+    // 4. Busca direta O(1) na célula geográfica via chave inteira rápida
+    const cx = Math.floor(lon / SPATIAL_CELL_SIZE);
+    const cy = Math.floor(lat / SPATIAL_CELL_SIZE);
+    const cellKey = ((cx * 100003 + cy) | 0);
+    const candidatos = spatialGrid.get(cellKey);
+    if (!candidatos || !candidatos.length) return null;
+
+    for (let i = 0; i < candidatos.length; i++) {
+      const b = candidatos[i];
+      const bb = b.bbox;
+      if (lon < bb.minLon || lon > bb.maxLon || lat < bb.minLat || lat > bb.maxLat) continue;
+      for (let p = 0; p < b.polygons.length; p++) {
+        if (dentroPoly(lon, lat, b.polygons[p])) {
+          ultimoBlocoEncontrado = b;
+          if (equipamento) ultimosBlocosPorEquipamento.set(equipamento, b);
+          return b;
+        }
+      }
     }
     return null;
   };
@@ -371,22 +487,34 @@
   window.limparChuvaDB=()=>limpar(STORES.chuva);
 
   async function importar(tipo,input){
-    const file=input.files&&input.files[0];if(!file)return;
+    const files=Array.from(input.files||[]);if(!files.length)return;
     const st={blocos:'statusBlocos',produtividade:'statusProdutividade',chuva:'statusChuva'}[tipo];
-    status(st,'Lendo arquivo...','warn');
+    status(st,`Lendo ${files.length} arquivo(s)...`,'warn');
     try{
-      const texto=await lerArquivo(file), t=texto.trim();
-      const linhas=(t.startsWith('{')||t.startsWith('[')||/\.json$/i.test(file.name))?json(t):csv(t);
-      if(!linhas.length)throw new Error('Nenhum registro encontrado.');
+      let todosNovos=[];
+      for(let i=0; i<files.length; i++){
+        const file=files[i];
+        if(files.length>1) status(st,`Processando ${i+1}/${files.length}: ${file.name}...`,'warn');
+        const texto=await lerArquivo(file), t=texto.trim();
+        const linhas=(t.startsWith('{')||t.startsWith('[')||/\.json$/i.test(file.name))?json(t):csv(t);
+        if(!linhas.length) continue;
+        if(tipo==='blocos'){
+          const arr=montarBlocos(linhas);
+          todosNovos.push(...arr);
+        }else if(tipo==='produtividade'){
+          todosNovos.push(...linhas.map(normalizarProd));
+        }else{
+          const ch=linhas.map(o=>({cd_unidade:String(campo(o,['cd_unidade','unidade'])??'').trim(),cd_bloco:String(campo(o,['cd_bloco','bloco'])??'').trim(),dataChuva:dataChuva(campo(o,['data_chuva','datachuva'])),safra:String(campo(o,['safra','ano_safra','ds_ano_safra'])??'').trim(),totalChuvaDia:numProd(campo(o,['total_chuva_dia','totalchuviadia','chuva_dia','chuva']))})).filter(x=>x.dataChuva&&x.cd_unidade&&x.cd_bloco);
+          todosNovos.push(...ch);
+        }
+      }
+      if(!todosNovos.length)throw new Error('Nenhum registro válido foi encontrado nos arquivos selecionados.');
       if(tipo==='blocos'){
-        const arr=montarBlocos(linhas);if(!arr.length)throw new Error('Nenhum bloco com geometria válida foi encontrado.');
-        window.blocos=arr;await salvar(STORES.blocos,arr);
+        window.blocos=todosNovos;await salvar(STORES.blocos,todosNovos);
       }else if(tipo==='produtividade'){
-        window.produtividade=linhas.map(normalizarProd);await salvar(STORES.produtividade,window.produtividade);
+        window.produtividade=todosNovos;await salvar(STORES.produtividade,window.produtividade);
       }else{
-        window.chuva=linhas.map(o=>({cd_unidade:String(campo(o,['cd_unidade','unidade'])??'').trim(),cd_bloco:String(campo(o,['cd_bloco','bloco'])??'').trim(),dataChuva:dataChuva(campo(o,['data_chuva','datachuva'])),safra:String(campo(o,['safra','ano_safra','ds_ano_safra'])??'').trim(),totalChuvaDia:numProd(campo(o,['total_chuva_dia','totalchuviadia','chuva_dia','chuva']))})).filter(x=>x.dataChuva&&x.cd_unidade&&x.cd_bloco);
-        if(!window.chuva.length)throw new Error('Nenhum registro de chuva válido foi encontrado.');
-        await salvar(STORES.chuva,window.chuva);
+        window.chuva=todosNovos;await salvar(STORES.chuva,window.chuva);
       }
       atualizarUI();
     }catch(e){alert(`Não foi possível carregar a base de ${tipo}: ${e.message||e}`);atualizarUI();}

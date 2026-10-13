@@ -22,7 +22,7 @@
     body{margin:0;font-family:Manrope,Inter,Arial,sans-serif;background:
       radial-gradient(850px 360px at 10% -8%,rgba(63,125,93,.10),transparent 65%),
       linear-gradient(180deg,#fafbf9 0%,#f4f6f3 100%);color:var(--foreground)}
-    .main{max-width:1400px;margin:0 auto;padding:34px 32px 64px}
+    .main{max-width:1480px;padding:34px 32px 64px}
     .hero{margin-bottom:26px}
     .hero-kicker{display:flex;align-items:center;gap:8px;margin-bottom:7px;color:var(--primary);
       font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
@@ -30,7 +30,7 @@
     .hero h1{margin:0 0 8px;font-family:"DM Sans",Manrope,Arial,sans-serif;font-size:32px;
       line-height:1.12;letter-spacing:-.035em;font-weight:700;color:#20382d}
     .hero p{max-width:900px;margin:0;color:var(--muted);line-height:1.65;font-size:14px}
-    .base-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:18px}
+    .base-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px;margin-bottom:18px}
     .card{background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
     .base-card{display:flex;flex-direction:column;min-height:350px;padding:22px;
       transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
@@ -75,7 +75,7 @@
     .telemetria-delete{display:grid;place-items:center;width:34px;height:34px;padding:0;background:#f6f8f6;
       border:1px solid var(--border);border-radius:9px;color:#68736c;cursor:pointer}
     .telemetria-delete:hover{background:#fbeceb;color:#9a4740;border-color:#e7c7c4}
-    .telemetria-delete svg{width:15px;height:15px}
+    .telemetria-delete svg,.telemetria-delete i{width:15px;height:15px;pointer-events:none}
     .telemetria-empty{padding:18px 0 4px;color:var(--muted);font-size:12px}
     .info{padding:20px 22px;background:linear-gradient(135deg,#1d4636,#17372b);color:#fff;
       border-radius:var(--radius);box-shadow:0 12px 30px rgba(23,55,43,.12)}
@@ -92,12 +92,12 @@
 </head>
 <body>
 <div id="appSidebarMount"></div><div class="menu-overlay" id="menuOverlay" onclick="fecharMenuLateral()"></div>
-<main class="main">
+<main class="main app-container">
   <section class="hero"><div class="hero-kicker"><i data-lucide="database"></i> AgroVision / Dados compartilhados</div><h1>Bases compartilhadas</h1><p>As bases abaixo são carregadas uma vez e ficam disponíveis para <strong>Colhedora, Tratos e Plantadora</strong>. Não é necessário reenviar a mesma base em cada módulo.</p></section>
   <section class="base-grid">
-    <article class="card base-card"><div class="base-icon"><i data-lucide="map-pin"></i></div><h2>Blocos</h2><p>Base geográfica dos blocos. É usada para localizar a trajetória, validar se os pontos estão dentro do bloco e relacionar gleba, bloco, talhão e unidade.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar base de blocos<input id="arquivoBlocos" type="file" accept=".csv,.json,.txt" hidden onchange="carregarBaseBlocos()"></label><button class="remove" onclick="removerBaseBlocos()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusBlocos" class="badge">Carregando...</span></div></article>
-    <article class="card base-card"><div class="base-icon"><i data-lucide="sprout"></i></div><h2>Produtividade de cana</h2><p>Base de estimativas usada para relacionar SAFRA + GLEBA + BLOCO + TALHÃO e calcular as toneladas estimadas das ocorrências.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar produtividade<input id="arquivoProdutividade" type="file" accept=".csv,.json,.txt" hidden onchange="carregarBaseProdutividade()"></label><button class="remove" onclick="removerBaseProdutividade()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusProdutividade" class="badge">Carregando...</span></div></article>
-    <article class="card base-card"><div class="base-icon"><i data-lucide="cloud-rain"></i></div><h2>Chuva</h2><p>Base diária de chuva vinculada por data + unidade + bloco. Pode ser usada por qualquer tipo de equipamento.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar base de chuva<input id="arquivoChuva" type="file" accept=".csv,.txt" hidden onchange="carregarBaseChuva()"></label><button class="remove" onclick="removerBaseChuva()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusChuva" class="badge">Carregando...</span></div></article>
+    <article class="card base-card"><div class="base-icon"><i data-lucide="map-pin"></i></div><h2>Blocos</h2><p>Base geográfica dos blocos. É usada para localizar a trajetória, validar se os pontos estão dentro do bloco e relacionar gleba, bloco, talhão e unidade.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar base de blocos<input id="arquivoBlocos" type="file" accept=".csv,.json,.txt" multiple hidden onchange="carregarBaseBlocos()"></label><button class="remove" onclick="removerBaseBlocos()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusBlocos" class="badge">Carregando...</span></div></article>
+    <article class="card base-card"><div class="base-icon"><i data-lucide="sprout"></i></div><h2>Produtividade de cana</h2><p>Base de estimativas usada para relacionar SAFRA + GLEBA + BLOCO + TALHÃO e calcular as toneladas estimadas das ocorrências.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar produtividade<input id="arquivoProdutividade" type="file" accept=".csv,.json,.txt" multiple hidden onchange="carregarBaseProdutividade()"></label><button class="remove" onclick="removerBaseProdutividade()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusProdutividade" class="badge">Carregando...</span></div></article>
+    <article class="card base-card"><div class="base-icon"><i data-lucide="cloud-rain"></i></div><h2>Chuva</h2><p>Base diária de chuva vinculada por data + unidade + bloco. Pode ser usada por qualquer tipo de equipamento.</p><div class="upload"><label class="file-label"><i data-lucide="upload"></i> Selecionar base de chuva<input id="arquivoChuva" type="file" accept=".csv,.txt" multiple hidden onchange="carregarBaseChuva()"></label><button class="remove" onclick="removerBaseChuva()"><i data-lucide="trash-2"></i> Remover base salva</button><span id="statusChuva" class="badge">Carregando...</span></div></article>
   </section>
   <section class="card telemetria-base">
     <div class="telemetria-toolbar">
@@ -105,9 +105,9 @@
       <button class="remove" style="width:auto;margin:0" onclick="atualizarTelemetriaUI()"><i data-lucide="refresh-cw"></i> Atualizar</button>
     </div>
     <div class="telemetria-grid">
-      <article class="telemetria-card"><h2><i data-lucide="tractor"></i> Colhedora</h2><div id="resumoTelemetriaColhedora" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaColhedora" type="file" accept=".csv,.txt" hidden onchange="adicionarTelemetria('colhedora',this)"></label><div id="listaTelemetriaColhedora" class="telemetria-list"></div></article>
-      <article class="telemetria-card"><h2><i data-lucide="sprout"></i> Tratos</h2><div id="resumoTelemetriaTratos" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaTratos" type="file" accept=".csv,.txt" hidden onchange="adicionarTelemetria('tratos',this)"></label><div id="listaTelemetriaTratos" class="telemetria-list"></div></article>
-      <article class="telemetria-card"><h2><i data-lucide="wheat"></i> Plantadora</h2><div id="resumoTelemetriaPlantadora" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaPlantadora" type="file" accept=".csv,.txt" hidden onchange="adicionarTelemetria('plantadora',this)"></label><div id="listaTelemetriaPlantadora" class="telemetria-list"></div></article>
+      <article class="telemetria-card"><h2><i data-lucide="tractor"></i> Colhedora</h2><div id="resumoTelemetriaColhedora" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaColhedora" type="file" accept=".csv,.txt" multiple hidden onchange="adicionarTelemetria('colhedora',this)"></label><button class="remove" style="margin-top:8px" onclick="limparTodosTelemetria('colhedora')"><i data-lucide="trash-2"></i> Limpar todos os arquivos</button><div id="listaTelemetriaColhedora" class="telemetria-list"></div></article>
+      <article class="telemetria-card"><h2><i data-lucide="sprout"></i> Tratos</h2><div id="resumoTelemetriaTratos" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaTratos" type="file" accept=".csv,.txt" multiple hidden onchange="adicionarTelemetria('tratos',this)"></label><button class="remove" style="margin-top:8px" onclick="limparTodosTelemetria('tratos')"><i data-lucide="trash-2"></i> Limpar todos os arquivos</button><div id="listaTelemetriaTratos" class="telemetria-list"></div></article>
+      <article class="telemetria-card"><h2><i data-lucide="wheat"></i> Plantadora</h2><div id="resumoTelemetriaPlantadora" class="telemetria-meta">Carregando...</div><label class="telemetria-add"><i data-lucide="plus"></i> Adicionar telemetria<input id="arquivoTelemetriaPlantadora" type="file" accept=".csv,.txt" multiple hidden onchange="adicionarTelemetria('plantadora',this)"></label><button class="remove" style="margin-top:8px" onclick="limparTodosTelemetria('plantadora')"><i data-lucide="trash-2"></i> Limpar todos os arquivos</button><div id="listaTelemetriaPlantadora" class="telemetria-list"></div></article>
     </div>
   </section>
 
@@ -127,12 +127,67 @@ async function atualizarTelemetriaUI(){
     if(!lista.length){resumo.textContent='Nenhum arquivo armazenado neste navegador.';box.innerHTML='<div class="telemetria-empty">Ainda não há arquivos. Adicione o primeiro arquivo acima.</div>';continue;}
     const bytes=lista.reduce((s,x)=>s+x.tamanho,0),reg=lista.reduce((s,x)=>s+(x.registros||0),0),min=Math.min(...lista.map(x=>x.dataMinMs)),max=Math.max(...lista.map(x=>x.dataMaxMs));
     resumo.innerHTML=`<strong>${lista.length}</strong> arquivo(s) · <strong>${telemetriaBase.fmtBytes(bytes)}</strong> · <strong>${reg.toLocaleString('pt-BR')}</strong> registros<br>Período: ${telemetriaBase.fmtDate(min)} → ${telemetriaBase.fmtDate(max)}`;
-    box.innerHTML=lista.slice().reverse().map(x=>`<div class="telemetria-item"><div><strong>${esc(x.nome)}</strong><small>${telemetriaBase.fmtDate(x.dataMinMs)} · ${telemetriaBase.fmtBytes(x.tamanho)} · ${(x.registros||0).toLocaleString('pt-BR')} registros</small></div><span class="badge ok" style="margin:0"><i data-lucide="check"></i> Salvo</span><button class="telemetria-delete" title="Remover arquivo" aria-label="Remover arquivo" onclick="removerTelemetria(${JSON.stringify(x.id)},'${tipo}')"><i data-lucide="trash-2"></i></button></div>`).join('');
+    box.innerHTML=lista.slice().reverse().map(x=>`<div class="telemetria-item"><div><strong>${esc(x.nome)}</strong><small>${telemetriaBase.fmtDate(x.dataMinMs)} · ${telemetriaBase.fmtBytes(x.tamanho)} · ${(x.registros||0).toLocaleString('pt-BR')} registros</small></div><span class="badge ok" style="margin:0"><i data-lucide="check"></i> Salvo</span><button type="button" class="telemetria-delete" title="Remover arquivo" aria-label="Remover arquivo" data-id="${esc(x.id)}" data-tipo="${esc(tipo)}" onclick="removerTelemetria(this.dataset.id,this.dataset.tipo)"><i data-lucide="trash-2"></i></button></div>`).join('');
   }
   if(window.lucide) window.lucide.createIcons();
 }
-async function adicionarTelemetria(tipo,input){const file=input.files&&input.files[0];if(!file)return;try{await telemetriaBase.garantirPersistencia();await telemetriaBase.adicionar(tipo,file);alert(`Telemetria de ${telemetriaBase.TIPOS[tipo]} adicionada com sucesso.`);await atualizarTelemetriaUI();}catch(e){alert(`Não foi possível adicionar a telemetria.\n\n${e.message||e}`);}finally{input.value='';}}
-async function removerTelemetria(id,tipo){if(!confirm('Remover este arquivo da base de telemetria?'))return;try{await telemetriaBase.remover(id);await atualizarTelemetriaUI();}catch(e){alert(e.message||e);}}
+async function adicionarTelemetria(tipo,input){
+  const files=Array.from(input.files||[]);
+  if(!files.length)return;
+  const cap=tipo.charAt(0).toUpperCase()+tipo.slice(1);
+  const resumo=document.getElementById('resumoTelemetria'+cap);
+  try{
+    await telemetriaBase.garantirPersistencia();
+    let sucessos=0;
+    const erros=[];
+    for(let i=0;i<files.length;i++){
+      if(resumo){
+        resumo.innerHTML=`<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,0.2);margin-right:7px;animation:pulse 1.2s infinite"></span><strong>Processando ${i+1} de ${files.length}:</strong> ${esc(file.name)} (${telemetriaBase.fmtBytes(file.size)})...`;
+      }
+      try{
+        await telemetriaBase.adicionar(tipo,file);
+        sucessos++;
+      }catch(err){
+        console.error(`Erro ao adicionar ${file.name}:`,err);
+        erros.push(`${file.name}: ${err.message||err}`);
+      }
+    }
+    await atualizarTelemetriaUI();
+    if(erros.length===0){
+      alert(`${sucessos} arquivo(s) de telemetria (${telemetriaBase.TIPOS[tipo]}) adicionado(s) com sucesso!`);
+    }else if(sucessos>0){
+      alert(`${sucessos} arquivo(s) adicionado(s) com sucesso.\n\n${erros.length} falharam:\n${erros.slice(0,5).join('\n')}${erros.length>5?'\n...':''}`);
+    }else{
+      alert(`Não foi possível adicionar os arquivos:\n\n${erros.slice(0,5).join('\n')}`);
+    }
+  }catch(e){
+    alert(`Erro ao processar telemetria:\n\n${e.message||e}`);
+  }finally{
+    input.value='';
+    await atualizarTelemetriaUI();
+  }
+}
+async function removerTelemetria(id,tipo){
+  if(!id)return;
+  if(!confirm('Remover este arquivo da base de telemetria?'))return;
+  try{
+    await telemetriaBase.remover(id);
+    await atualizarTelemetriaUI();
+  }catch(e){
+    alert('Não foi possível remover o arquivo: '+(e.message||e));
+  }
+}
+async function limparTodosTelemetria(tipo){
+  const lista=await telemetriaBase.listar(tipo);
+  if(!lista.length){alert('Nenhum arquivo armazenado para remover.');return;}
+  if(!confirm(`Remover TODOS os ${lista.length} arquivo(s) de telemetria de ${telemetriaBase.TIPOS[tipo]} salvos neste navegador?`))return;
+  try{
+    await telemetriaBase.limparTipo(tipo);
+    await atualizarTelemetriaUI();
+  }catch(e){
+    alert('Não foi possível remover os arquivos: '+(e.message||e));
+  }
+}
 window.addEventListener('load',atualizarTelemetriaUI);
 </script>
 </body>

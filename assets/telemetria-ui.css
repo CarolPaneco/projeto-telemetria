@@ -1,0 +1,366 @@
+/* ==========================================================================
+   AgroVision Telemetria UI & Calendário
+   Estilos compartilhados para Colhedora, Tratos, Plantadora e Bases
+   ========================================================================== */
+
+/* Input com ícone de mini-calendário */
+.input-com-icone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-com-icone input {
+  width: 100% !important;
+  padding-right: 40px !important;
+  box-sizing: border-box !important;
+}
+
+.btn-mini-calendario {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 17px;
+  line-height: 1;
+  border-radius: 6px;
+  opacity: 0.75;
+  transition: opacity .15s, transform .15s, background .15s;
+  z-index: 2;
+  user-select: none;
+}
+
+.btn-mini-calendario:hover {
+  opacity: 1;
+  background: rgba(14, 36, 29, 0.08);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.btn-mini-calendario:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Customização Flatpickr — Tema AgroVision */
+.flatpickr-calendar {
+  background: var(--papel, #ffffff) !important;
+  border: 1px solid var(--borda-forte, #c9c6b5) !important;
+  box-shadow: 0 4px 20px -4px rgba(14,36,29,0.22), 0 1px 3px rgba(14,36,29,0.08) !important;
+  border-radius: 14px !important;
+  font-family: "Inter", Arial, sans-serif !important;
+  color: var(--texto, #1e241f) !important;
+  padding: 10px !important;
+  overflow: hidden !important;
+}
+
+.flatpickr-calendar.arrowTop:before,
+.flatpickr-calendar.arrowTop:after {
+  border-bottom-color: var(--verde-900, #163329) !important;
+}
+
+.flatpickr-calendar .flatpickr-months {
+  background: var(--verde-900, #163329) !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  padding: 6px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  position: relative !important;
+}
+
+.flatpickr-months .flatpickr-month {
+  color: #fff !important;
+  fill: #fff !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+.flatpickr-current-month {
+  position: static !important;
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+.flatpickr-current-month span.cur-month {
+  font-family: "Inter", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: capitalize !important;
+  display: inline-block !important;
+}
+
+.flatpickr-current-month span.cur-month:hover {
+  background: transparent !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  color: #fff !important;
+  font-weight: 700 !important;
+  background: var(--verde-900, #163329) !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 14.5px !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+  cursor: pointer !important;
+}
+
+.flatpickr-current-month .numInputWrapper {
+  width: 58px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.flatpickr-current-month input.cur-year {
+  font-family: "IBM Plex Mono", monospace !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+  text-align: center !important;
+  line-height: 1.2 !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  -moz-appearance: textfield !important;
+}
+
+.flatpickr-current-month input.cur-year::-webkit-outer-spin-button,
+.flatpickr-current-month input.cur-year::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.flatpickr-current-month input.cur-year:focus {
+  background: rgba(255, 255, 255, 0.22) !important;
+  outline: none !important;
+  border-color: var(--trigo-500, #c79a32) !important;
+}
+
+.flatpickr-current-month .numInputWrapper span.arrowUp,
+.flatpickr-current-month .numInputWrapper span.arrowDown {
+  display: none !important;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.09) !important;
+  color: #fff !important;
+  fill: #fff !important;
+  cursor: pointer !important;
+  transition: background .15s, transform .15s !important;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+  transform: scale(1.08) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+  width: 14px !important;
+  height: 14px !important;
+  fill: #fff !important;
+}
+
+.flatpickr-weekdays {
+  margin-top: 6px !important;
+}
+
+.flatpickr-calendar span.flatpickr-weekday {
+  color: var(--texto-suave, #5b6459) !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+}
+
+.flatpickr-day {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  color: var(--texto, #1e241f) !important;
+  margin: 1px 0 !important;
+  transition: all .12s ease !important;
+}
+
+/* Destaque de intervalo selecionado (Colorindo os dias do período) */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: var(--verde-700, #28594a) !important;
+  border-color: var(--verde-700, #28594a) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(40, 89, 74, 0.35) !important;
+}
+
+.flatpickr-day.startRange {
+  border-radius: 8px 0 0 8px !important;
+}
+
+.flatpickr-day.endRange {
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.flatpickr-day.startRange.endRange {
+  border-radius: 8px !important;
+}
+
+.flatpickr-day.inRange {
+  background: var(--verde-100, #e7f0e6) !important;
+  border-color: transparent !important;
+  color: var(--verde-950, #0e241d) !important;
+  box-shadow: -5px 0 0 var(--verde-100, #e7f0e6), 5px 0 0 var(--verde-100, #e7f0e6) !important;
+  border-radius: 0 !important;
+}
+
+.flatpickr-day:hover:not(.selected):not(.startRange):not(.endRange):not(.disabled) {
+  background: var(--verde-200, #cfe1d3) !important;
+  border-color: var(--verde-200, #cfe1d3) !important;
+  color: var(--verde-950, #0e241d) !important;
+}
+
+.flatpickr-day.disabled,
+.flatpickr-day.disabled:hover {
+  color: var(--texto-fraco, #828c7f) !important;
+  opacity: 0.32 !important;
+  cursor: not-allowed !important;
+}
+
+/* ==========================================================================
+   Monitor de Processamento Ao Vivo
+   ========================================================================== */
+
+.progresso-container-pro {
+  margin: 14px 0 16px;
+  background: var(--papel, #ffffff);
+  border: 1px solid var(--borda, #e1dfd3);
+  border-radius: var(--raio-card, 16px);
+  padding: 14px 16px;
+  box-shadow: var(--sombra-card, 0 1px 2px rgba(14,36,29,.06));
+}
+
+.progresso-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progresso-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--verde-900, #163329);
+  background: var(--verde-100, #e7f0e6);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--verde-200, #cfe1d3);
+}
+
+.pulso-ativo {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  background: #16a34a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  animation: pulsoVerde 1.4s infinite;
+}
+
+@keyframes pulsoVerde {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+.progresso-cronometro {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave, #5b6459);
+  font-variant-numeric: tabular-nums;
+  background: var(--bg-alt, #efeee5);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--borda, #e1dfd3);
+}
+
+.progress-bar-pro {
+  width: 100%;
+  height: 14px;
+  background: var(--bg-alt, #efeee5);
+  border: 1px solid var(--borda, #e1dfd3);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill-pro {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--verde-700, #28594a), var(--verde-500, #3e7a61), var(--trigo-500, #c79a32));
+  background-size: 30px 30px;
+  background-image: linear-gradient(135deg, rgba(255,255,255,.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 75%, transparent 75%, transparent);
+  animation: listrasMover 1s linear infinite;
+  transition: width .25s ease;
+  border-radius: 999px;
+}
+
+.progress-fill-pro.concluido {
+  animation: none;
+  background: var(--ok-txt, #1e4436);
+}
+
+.progresso-info-bottom {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.progresso-etapa-txt {
+  font-weight: 700;
+  color: var(--verde-950, #0e241d);
+}
+
+.progresso-metricas-txt {
+  color: var(--texto-suave, #5b6459);
+}
+
